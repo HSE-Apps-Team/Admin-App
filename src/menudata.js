@@ -1,0 +1,30 @@
+const menuData = {
+  schedule: {
+    title: "Schedule Editor Menu",
+    items: [
+      {
+        title: "Main Schedules",
+        description:
+          "Edit the two main schedules for the Schedule App: Royal and Gray days",
+        href: "/schedule",
+      },
+      {
+        title: "Special Schedules",
+        description: "Create new schedules for special event days",
+        href: "/schedule/special",
+      },
+      {
+        title: "Events",
+        description: "Create new events that use special schedules",
+        href: "/schedule/events",
+      },
+      {
+        title: "Announcements",
+        description: "Create announcements that appear on the schedule app",
+        href: "/schedule/announcements",
+      },
+    ],
+  },
+};
+
+export default menuData;
