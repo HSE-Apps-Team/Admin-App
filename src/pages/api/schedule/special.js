@@ -10,6 +10,28 @@ export default async function handler(req, res) {
   if (req.method == "GET") {
     const specialSchedules = await collection.find().toArray();
     res.status(200).json(specialSchedules);
+  } else if (req.method == "POST") {
+    const newSpecialSchedule = req.body;
+    await collection.insertOne(newSpecialSchedule);
+    res.status(200).json({ message: "Special Schedule added" });
+  } else if (req.method == "PATCH") {
+    const newSpecialSchedule = req.body;
+    console.log(newSpecialSchedule.SpecialType);
+    await collection.updateOne(
+      { _id: new ObjectId(newSpecialSchedule._id) },
+      {
+        $set: {
+          data: newSpecialSchedule.data,
+          Name: newSpecialSchedule.Name,
+          SpecialType: newSpecialSchedule.SpecialType,
+        },
+      }
+    );
+    res.status(200).json({ message: "Special Schedule updated" });
+  } else if (req.method == "DELETE") {
+    const newSpecialSchedule = req.body;
+    await collection.deleteOne({ _id: new ObjectId(newSpecialSchedule._id) });
+    res.status(200).json({ message: "Special Schedule deleted" });
   }
 
   setTimeout(() => {

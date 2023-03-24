@@ -9,7 +9,6 @@ export default function AnnouncementPage() {
   useEffect(() => {
     fetch("/api/schedule/announcements").then((res) => {
       res.json().then((data) => {
-        console.log(data);
         setAnnouncements(data);
       });
     });

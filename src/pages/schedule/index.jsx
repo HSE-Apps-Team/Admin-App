@@ -31,7 +31,6 @@ export default function MainSchedule() {
 
   const onPeriodChange = (e, index, periodIndex) => {
     setMainSchedules((prev) => {
-      console.log(e.target.value);
       const newSchedules = [...prev];
       newSchedules[index].data[periodIndex][e.target.id] = e.target.value;
       return newSchedules;
@@ -40,7 +39,6 @@ export default function MainSchedule() {
 
   const onLunchPeriodChange = (e, index, periodIndex, lunchType) => {
     setMainSchedules((prev) => {
-      console.log(e.target.value);
       const newSchedules = [...prev];
       newSchedules[index].data[periodIndex].lunchPeriods[lunchType][
         e.target.id

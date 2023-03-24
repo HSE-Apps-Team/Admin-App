@@ -5,19 +5,19 @@ import connectDB from "@/lib/schedule.db";
 export default async function handler(req, res) {
   const client = await connectDB();
   const db = client.db("Data");
-  const collection = db.collection("Announcements");
+  const collection = db.collection("Events");
 
   if (req.method == "GET") {
-    const announcements = await collection.find().toArray();
-    res.status(200).json(announcements);
+    const events = await collection.find().toArray();
+    res.status(200).json(events);
   } else if (req.method == "POST") {
-    const announcement = req.body;
-    await collection.insertOne(announcement);
-    res.status(200).json({ message: "Announcement created" });
+    const event = req.body;
+    await collection.insertOne(event);
+    res.status(200).json({ message: "Event created" });
   } else if (req.method == "DELETE") {
     const id = req.body.id;
     await collection.deleteOne({ _id: new ObjectId(id) });
-    res.status(200).json({ message: "Announcement deleted" });
+    res.status(200).json({ message: "Event deleted" });
   }
 
   setTimeout(() => {

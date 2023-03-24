@@ -11,8 +11,6 @@ export default async function handler(req, res) {
   } else if (req.method == "PUT") {
     const schedule = req.body;
 
-    // Update the schedule for each day. The "Type" field is used to identify the day.
-
     schedule.map(async (day) => {
       await collection.updateOne(
         { Type: day.Type },
