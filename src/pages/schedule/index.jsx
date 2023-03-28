@@ -29,6 +29,15 @@ export default function MainSchedule() {
     });
   };
 
+  const handleReset = (e) => {
+    e.preventDefault();
+    fetch("/api/schedule/cache").then((res) => {
+      if(res.status == 200){
+        alert("Schedule Cache Reset!");
+      }
+    })
+  }
+
   const onPeriodChange = (e, index, periodIndex) => {
     setMainSchedules((prev) => {
       console.log(e.target.value);
@@ -138,6 +147,12 @@ export default function MainSchedule() {
         ))}
       </div>
       <div className="fixed right-8 bottom-8">
+        <button
+          className="py-2 px-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-lg mr-2"
+          onClick={handleReset}
+        >
+          Reset Cache
+        </button>
         <button
           className="py-2 px-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-lg"
           onClick={handleSave}
