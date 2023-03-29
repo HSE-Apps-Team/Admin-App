@@ -135,12 +135,17 @@ export default function SpecialSchedules() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(selectedSchedule),
-      }).then((res) => {
-        if (res.status == 200) {
-          alert("Schedule Successfully Saved!");
-        }
-      });
-      setSchedules((prev) => [...prev, selectedSchedule]);
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data._id) {
+            alert("Schedule Successfully Saved!");
+            setSchedules((prev) => [
+              ...prev,
+              { ...selectedSchedule, _id: data._id },
+            ]);
+          }
+        });
     }
   };
 

@@ -15,28 +15,36 @@ export default function AnnouncementPage() {
   }, []);
 
   const handleSubmit = (e) => {
+    const newBody = {
+      Date: new Date(e.target[0].value).toLocaleDateString("en-US", {
+        timeZone: "UTC",
+      }),
+      Title: e.target[1].value,
+      Content: e.target[2].value,
+    };
     e.preventDefault();
     fetch("/api/schedule/announcements", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        Date: new Date(e.target[0].value).toLocaleDateString("en-US", {
-          timeZone: "UTC",
-        }),
-        Title: e.target[1].value,
-        Content: e.target[2].value,
-      }),
-    }).then((res) => {
-      if (res.status == 200) {
-        alert("Announcement Successfully Added!");
-        e.target[0].value = "";
-        e.target[1].value = "";
-        e.target[2].value = "";
-      }
-    });
+      body: JSON.stringify(newBody),
+    }).then((res) =>
+      res.json().then((data) => {
+        if (data._id) {
+          alert("Announcement Successfully Added!");
+          e.target[0].value = "";
+          e.target[1].value = "";
+          e.target[2].value = "";
+          console.log(newBody);
+          setAnnouncements((prev) => {
+            return [...prev, { ...newBody, _id: data._id }];
+          });
+        }
+      })
+    );
   };
+  console.log(announcements);
 
   const handleDelete = (id) => {
     fetch("/api/schedule/announcements/", {
@@ -49,7 +57,6 @@ export default function AnnouncementPage() {
       }),
     }).then((res) => {
       if (res.status == 200) {
-        alert("Announcement Successfully Deleted!");
         setAnnouncements((prev) => {
           const newAnnouncements = [...prev];
           newAnnouncements.splice(
@@ -84,7 +91,12 @@ export default function AnnouncementPage() {
           <div className="flex flex-col gap-y-2 ">
             <div>
               <h1 className="mb-1">Date:</h1>
-              <input required id="date" type="date" className="rounded-md" />
+              <input
+                required
+                id="date"
+                type="date"
+                className="rounded-md py-1"
+              />
             </div>
             <div>
               <h1 className="mb-1">Title:</h1>
@@ -92,7 +104,7 @@ export default function AnnouncementPage() {
                 required
                 id="title"
                 type="text"
-                className="rounded-md w-full"
+                className="rounded-md w-full py-1 px-1"
               />
             </div>
             <div>

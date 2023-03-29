@@ -1,6 +1,6 @@
 import { MongoClient } from "mongodb";
 
-const uri = process.env.SCHEDULE_MONGODB_URI;
+const uri = process.env.COURSES_MONGODB_URI;
 
 const options = {
   useNewUrlParser: true,

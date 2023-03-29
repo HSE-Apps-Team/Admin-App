@@ -12,8 +12,10 @@ export default async function handler(req, res) {
     res.status(200).json(announcements);
   } else if (req.method == "POST") {
     const announcement = req.body;
-    await collection.insertOne(announcement);
-    res.status(200).json({ message: "Announcement created" });
+    const resp = await collection.insertOne(announcement);
+    res
+      .status(200)
+      .json({ message: "Announcement created", _id: resp.insertedId });
   } else if (req.method == "DELETE") {
     const id = req.body.id;
     await collection.deleteOne({ _id: new ObjectId(id) });

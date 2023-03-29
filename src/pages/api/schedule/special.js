@@ -12,11 +12,12 @@ export default async function handler(req, res) {
     res.status(200).json(specialSchedules);
   } else if (req.method == "POST") {
     const newSpecialSchedule = req.body;
-    await collection.insertOne(newSpecialSchedule);
-    res.status(200).json({ message: "Special Schedule added" });
+    const resp = await collection.insertOne(newSpecialSchedule);
+    res
+      .status(200)
+      .json({ _id: resp.insertedId, message: "Special Schedule added" });
   } else if (req.method == "PATCH") {
     const newSpecialSchedule = req.body;
-    console.log(newSpecialSchedule.SpecialType);
     await collection.updateOne(
       { _id: new ObjectId(newSpecialSchedule._id) },
       {

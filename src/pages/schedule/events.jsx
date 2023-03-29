@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 
+import ReactLoading from "react-loading";
+
 export default function EventPage() {
   const [events, setEvents] = useState(null);
   const [newEvent, setNewEvent] = useState({
@@ -39,7 +41,6 @@ export default function EventPage() {
             NoSchoolText: "",
           };
         });
-        console.log(newEvent);
         return;
       } else {
         setNewEvent((prev) => {
@@ -72,21 +73,23 @@ export default function EventPage() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(newEvent),
-    }).then((res) => {
-      if (res.status == 200) {
-        alert("Event Successfully Added!");
-        setNewEvent({
-          Date: "",
-          Title: "",
-          Description: "",
-          ScheduleName: specialSchedules[0].Name,
-        });
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data._id) {
+          alert("Event Successfully Added!");
+          setNewEvent({
+            Date: "",
+            Title: "",
+            Description: "",
+            ScheduleName: specialSchedules[0].Name,
+          });
 
-        setEvents((prev) => {
-          return [...prev, newEvent];
-        });
-      }
-    });
+          setEvents((prev) => {
+            return [...prev, { ...newEvent, _id: data._id }];
+          });
+        }
+      });
   };
 
   const handleDelete = (id) => {
@@ -113,7 +116,11 @@ export default function EventPage() {
   };
 
   if (!events || !specialSchedules) {
-    return <h1>Loading</h1>;
+    return (
+      <div className="flex w-full h-100vh items-center justify-center">
+        <ReactLoading type="spin" color="#101010" />
+      </div>
+    );
   }
   return (
     <>
@@ -177,7 +184,7 @@ export default function EventPage() {
                   id="Date"
                   type="date"
                   value={newEvent.Date}
-                  className="rounded-md"
+                  className="rounded-md py-1 "
                   onChange={handleFormChange}
                 />
               </div>
@@ -188,7 +195,7 @@ export default function EventPage() {
                   id="Title"
                   type="text"
                   value={newEvent.Title}
-                  className="rounded-md w-full"
+                  className="rounded-md w-full py-1 px-1"
                   onChange={handleFormChange}
                 />
               </div>
@@ -199,7 +206,7 @@ export default function EventPage() {
                   id="Description"
                   type="text"
                   value={newEvent.Description}
-                  className="rounded-md w-full"
+                  className="rounded-md w-full py-1 px-1"
                   onChange={handleFormChange}
                 />
               </div>
@@ -234,8 +241,9 @@ export default function EventPage() {
                   id="ScheduleName"
                   type="choose"
                   value={newEvent.ScheduleName}
-                  className="rounded-md w-full"
+                  className="rounded-md w-full py-1 px-1 disabled:bg-slate-400"
                   onChange={handleFormChange}
+                  disabled={newEvent.NoSchoolText != null}
                 >
                   {specialSchedules.map((schedule) => (
                     <option value={schedule.Name}>{schedule.Name}</option>

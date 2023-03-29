@@ -25,6 +25,16 @@ const menuData = {
       },
     ],
   },
+  courses: {
+    title: "Courses Editor Menu",
+    items: [
+      {
+        title: "Manage Courses",
+        description: "Create, edit, and delete courses",
+        href: "/courses",
+      },
+    ],
+  },
 };
 
 export default menuData;
