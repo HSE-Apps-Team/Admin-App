@@ -26,12 +26,17 @@ const menuData = {
     ],
   },
   courses: {
-    title: "Courses Editor Menu",
+    title: "Course Editor Menu",
     items: [
       {
-        title: "Manage Courses",
+        title: "Courses",
         description: "Create, edit, and delete courses",
         href: "/courses",
+      },
+      {
+        title: "Diplomas",
+        description: "Update diploma requirements and graduation information",
+        href: "/courses/diploma",
       },
     ],
   },

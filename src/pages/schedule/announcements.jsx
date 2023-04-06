@@ -109,7 +109,11 @@ export default function AnnouncementPage() {
             </div>
             <div>
               <h1 className="mb-1">Content:</h1>
-              <textarea required id="content" className="w-full pb-32" />
+              <textarea
+                required
+                id="content"
+                className="pb-32 rounded-md w-full py-1 px-1"
+              />
             </div>
           </div>
           <button

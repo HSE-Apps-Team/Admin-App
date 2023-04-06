@@ -113,7 +113,6 @@ export default function CoursePage() {
       body: JSON.stringify({ _id: id }),
     }).then((res) => {
       if (res.status == 200) {
-        alert("Course Successfully Deleted!");
         setCourses((prev) => {
           return prev.filter((course) => course._id != id);
         });
@@ -122,7 +121,11 @@ export default function CoursePage() {
   };
 
   if (!courses || !defaults || !selectedCourse) {
-    return <h1>Loading...</h1>;
+    return (
+      <div className="flex w-full h-100vh items-center justify-center">
+        <ReactLoading type="spin" color="#101010" />
+      </div>
+    );
   }
   return (
     <>
