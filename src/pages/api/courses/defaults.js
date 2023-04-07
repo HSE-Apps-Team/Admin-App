@@ -28,10 +28,10 @@ export default async function handler(req, res) {
       },
     };
     defaults.tags = await collection
-      .findOne({ _id: new ObjectId("5fb0b51daf2e9a5b5d311623") })
+      .findOne({ type: "tags" })
       .then((doc) => doc.list);
     defaults.credits = await collection
-      .findOne({ _id: new ObjectId("63b70ae306141b8168a75362") })
+      .findOne({ type: "credits" })
       .then((doc) => doc.list);
 
     res.status(200).json(defaults);

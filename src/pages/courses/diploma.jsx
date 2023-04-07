@@ -43,7 +43,7 @@ const Diploma = () => {
       name: "",
       credits: 0,
     };
-    console.log(newReq);
+
     setDiplomas(
       diplomas.map((d) =>
         d._id === selectedDiploma

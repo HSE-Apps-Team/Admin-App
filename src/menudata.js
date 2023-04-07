@@ -38,6 +38,11 @@ const menuData = {
         description: "Update diploma requirements and graduation information",
         href: "/courses/diploma",
       },
+      {
+        title: "Subjects and Tags",
+        description: "Update list of subjects and credits",
+        href: "/courses/subjects",
+      },
     ],
   },
 };

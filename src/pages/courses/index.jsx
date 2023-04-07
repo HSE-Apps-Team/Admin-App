@@ -301,7 +301,7 @@ export default function CoursePage() {
                   <input
                     required
                     id="course_id"
-                    type="number"
+                    type="text"
                     className="rounded-md w-full py-1 px-1"
                     value={selectedCourse.course_id}
                     onChange={handleCourseEdit}
