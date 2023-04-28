@@ -1,8 +1,17 @@
 // Import the custom database connection library
 import connectDB from "@/lib/schedule.db";
 
+// Import the referer checking function from the helper library
+import checkReferer from "@/helpers/checkreferer";
+
 // Define the handler function for the API route
 export default async function handler(req, res) {
+  // If the referer is not allowed, return a 403 error
+  if (!checkReferer(req)) {
+    res.status(403).json({ error: "Forbidden" });
+    return;
+  }
+
   // Connect to the database using the connectDB function
   const client = await connectDB();
   // Access the "Data" database

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 
+import ReactLoading from "react-loading";
+
 const Subjects = () => {
   const [tags, setTags] = useState(null);
   const [subjects, setSubjects] = useState(null);
@@ -147,7 +149,11 @@ const Subjects = () => {
   };
 
   if (!tags || !subjects) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex w-full h-100vh items-center justify-center">
+        <ReactLoading type="spin" color="#101010" />
+      </div>
+    );
   }
   return (
     <>

@@ -2,7 +2,15 @@ import { ObjectId } from "mongodb";
 
 import connectDB from "@/lib/courses.db";
 
+import checkReferer from "@/helpers/checkreferer";
+
 export default async function handler(req, res) {
+  // If the referer is not allowed, return a 403 error
+  if (!checkReferer(req)) {
+    res.status(403).json({ error: "Forbidden" });
+    return;
+  }
+
   const client = await connectDB();
   const db = client.db("CourseData");
   const collection = db.collection("CreditsTags");
