@@ -32,6 +32,11 @@ export default function CoursePage() {
     });
   }, []);
 
+  /**
+   * Sets the selected course based on the provided course object.
+   * If the course object has no _id, sets the selected course to default values.
+   * @param {Object} course - The course object to set as the selected course.
+   */
   const handleCourseSelect = (course) => {
     if (course._id) {
       setSelectedCourse(course);
@@ -40,6 +45,12 @@ export default function CoursePage() {
     }
   };
 
+  /**
+   * Toggles the selection of a specific option in the selected course's attributes.
+   * Adds or removes the option based on its presence in the current selection.
+   * @param {Event} e - The change event triggered by the input field.
+   * @param {string} type - The type of option being selected (e.g., "prerequisites").
+   */
   const handleMultiSelect = (e, type) => {
     let options = selectedCourse[type];
     if (options.includes(e.target.id)) {
@@ -53,6 +64,11 @@ export default function CoursePage() {
     }));
   };
 
+  /**
+   * Updates the selected course's attribute based on the input field
+   * that triggered the change event.
+   * @param {Event} e - The change event triggered by the input field.
+   */
   const handleCourseEdit = (e) => {
     setSelectedCourse((course) => ({
       ...course,
@@ -60,6 +76,11 @@ export default function CoursePage() {
     }));
   };
 
+  /**
+   * Sends an HTTP POST or PATCH request to add or update the selected course
+   * in the backend. If successful, shows an alert and updates the courses state.
+   * @param {Event} e - The submit event triggered by the form.
+   */
   const handleCourseSave = (e) => {
     e.preventDefault();
     console.log("clicked");
@@ -103,6 +124,12 @@ export default function CoursePage() {
       });
     }
   };
+
+  /**
+   * Sends an HTTP DELETE request to delete a course based on the provided id.
+   * If successful, updates the courses state to remove the deleted course.
+   * @param {string} id - The id of the course to be deleted.
+   */
 
   const handleCourseDelete = (id) => {
     fetch("/api/courses", {

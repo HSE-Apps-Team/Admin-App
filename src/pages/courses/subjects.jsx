@@ -14,6 +14,12 @@ const Subjects = () => {
       });
   }, []);
 
+  /**
+   * Saves a new or existing subject or tag to the backend.
+   * Sends a POST request if the item is new or a PUT request if it already exists.
+   * @param {string} type - The type of item being saved ("subject" or "tag").
+   * @param {string} id - The id of the item being saved.
+   */
   const handleSave = (type, id) => {
     let value;
     if (type == "subject") {
@@ -59,6 +65,13 @@ const Subjects = () => {
     }
   };
 
+  /**
+   * Updates the value of a subject or tag's attribute based on the input field
+   * that triggered the change event.
+   * @param {Event} e - The change event triggered by the input field.
+   * @param {string} id - The id of the item being edited.
+   * @param {string} type - The type of item being edited ("subject" or "tag").
+   */
   const handleChange = (e, id, type) => {
     if (type === "subject") {
       const value = subjects.find((subject) => subject._id === id);
@@ -71,6 +84,10 @@ const Subjects = () => {
     }
   };
 
+  /**
+   * Creates a new subject or tag and adds it to the corresponding state array.
+   * @param {string} type - The type of item being created ("subject" or "tag").
+   */
   const handleNew = (type) => {
     if (type == "subject") {
       setSubjects([
@@ -101,6 +118,11 @@ const Subjects = () => {
     }
   };
 
+  /**
+   * Deletes a subject or tag from the backend and removes it from the corresponding state array.
+   * @param {string} type - The type of item being deleted ("subject" or "tag").
+   * @param {string} id - The id of the item being deleted.
+   */
   const handleDelete = (type, id) => {
     let value;
     if (type == "subject") {

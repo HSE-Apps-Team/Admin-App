@@ -14,6 +14,11 @@ export default function MainSchedule() {
     );
   }, []);
 
+  /**
+   * Saves the main schedules by sending a PUT request to the backend.
+   * Alerts the user if the schedule has been saved successfully.
+   * @param {Event} e - The submit event triggered by the form.
+   */
   const handleSave = (e) => {
     e.preventDefault();
     fetch("/api/schedule", {
@@ -29,15 +34,26 @@ export default function MainSchedule() {
     });
   };
 
+  /**
+   * Resets the schedule cache by sending a request to the backend.
+   * Alerts the user if the schedule cache has been reset successfully.
+   * @param {Event} e - The submit event triggered by the form.
+   */
   const handleReset = (e) => {
     e.preventDefault();
     fetch("/api/schedule/cache").then((res) => {
-      if(res.status == 200){
+      if (res.status == 200) {
         alert("Schedule Cache Reset!");
       }
-    })
-  }
+    });
+  };
 
+  /**
+   * Updates the period data in the main schedules state when an input field is changed.
+   * @param {Event} e - The change event triggered by the form input.
+   * @param {number} index - The index of the schedule in the main schedules state.
+   * @param {number} periodIndex - The index of the period in the schedule data.
+   */
   const onPeriodChange = (e, index, periodIndex) => {
     setMainSchedules((prev) => {
       const newSchedules = [...prev];
@@ -46,6 +62,13 @@ export default function MainSchedule() {
     });
   };
 
+  /**
+   * Updates the lunch period data in the main schedules state when an input field is changed.
+   * @param {Event} e - The change event triggered by the form input.
+   * @param {number} index - The index of the schedule in the main schedules state.
+   * @param {number} periodIndex - The index of the period in the schedule data.
+   * @param {string} lunchType - The type of lunch period (e.g., "firstLunch", "secondLunch").
+   */
   const onLunchPeriodChange = (e, index, periodIndex, lunchType) => {
     setMainSchedules((prev) => {
       const newSchedules = [...prev];

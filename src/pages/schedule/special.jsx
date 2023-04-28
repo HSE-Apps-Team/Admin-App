@@ -20,6 +20,9 @@ export default function SpecialSchedules() {
     });
   }, []);
 
+  /**
+   * Adds a new period to the selected schedule.
+   */
   const handleAddPeriod = () => {
     setSelectedSchedule((prev) => ({
       ...prev,
@@ -30,6 +33,10 @@ export default function SpecialSchedules() {
     }));
   };
 
+  /**
+   * Updates the title of the selected schedule when the input field is changed.
+   * @param {Event} e - The change event triggered by the form input.
+   */
   const handleTitleChange = (e) => {
     setSelectedSchedule((prev) => ({
       ...prev,
@@ -37,6 +44,12 @@ export default function SpecialSchedules() {
     }));
   };
 
+  /**
+   * Updates the period data in the selected schedule state when an input field is changed.
+   * Handles lunch periods and passing periods separately.
+   * @param {Event} e - The change event triggered by the form input.
+   * @param {number} index - The index of the period in the selected schedule data.
+   */
   const handlePeriodChange = (e, index) => {
     if (e.target.id == "isLunchPeriod") {
       if (e.target.checked) {
@@ -74,6 +87,12 @@ export default function SpecialSchedules() {
     });
   };
 
+  /**
+   * Updates the lunch period data in the selected schedule state when an input field is changed.
+   * @param {Event} e - The change event triggered by the form input.
+   * @param {number} index - The index of the lunch period in the selected schedule data.
+   * @param {string} lunchType - The type of lunch period (e.g., "A", "B").
+   */
   const handleLunchChange = (e, index, lunchType) => {
     setSelectedSchedule((prev) => {
       const newSchedule = { ...prev };
@@ -83,6 +102,10 @@ export default function SpecialSchedules() {
     });
   };
 
+  /**
+   * Adds a new lunch type to the specified period in the selected schedule.
+   * @param {number} index - The index of the period in the selected schedule data.
+   */
   const handleAddLunchType = (index) => {
     setSelectedSchedule((prev) => ({
       ...prev,
@@ -103,6 +126,10 @@ export default function SpecialSchedules() {
     }));
   };
 
+  /**
+   * Saves the selected schedule by sending a POST or PATCH request to the backend.
+   * Alerts the user if the schedule has been saved successfully.
+   */
   const handleSave = () => {
     if (
       schedules.map((schedule) => schedule._id).includes(selectedSchedule._id)
@@ -149,6 +176,10 @@ export default function SpecialSchedules() {
     }
   };
 
+  /**
+   * Switches the selected schedule to a different schedule or creates a new schedule.
+   * @param {string} id - The _id of the schedule to switch to, or null to create a new schedule.
+   */
   const handleSwitchSelected = (id) => {
     if (!id) {
       return setSelectedSchedule({
@@ -160,6 +191,10 @@ export default function SpecialSchedules() {
     setSelectedSchedule(schedules.find((schedule) => schedule._id == id));
   };
 
+  /**
+   * Deletes the selected schedule by sending a DELETE request to the backend.
+   * @param {string} id - The _id of the schedule to delete.
+   */
   const handleDelete = (id) => {
     fetch("/api/schedule/special", {
       method: "DELETE",
@@ -177,6 +212,7 @@ export default function SpecialSchedules() {
       return newSchedules;
     });
   };
+
   if (!schedules) {
     return (
       <div className="flex w-full h-100vh items-center justify-center">

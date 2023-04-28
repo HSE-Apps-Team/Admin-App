@@ -20,6 +20,10 @@ const Diploma = () => {
     setSelectedSubject(null);
   }, [selectedDiploma]);
 
+  /**
+   * Sends an HTTP PUT request to update the diplomas in the backend.
+   * If successful, shows an alert that the diplomas have been saved.
+   */
   const handleSave = () => {
     fetch("/api/courses/diploma", {
       method: "PUT",
@@ -34,6 +38,11 @@ const Diploma = () => {
     });
   };
 
+  /**
+   * Adds a new requirement object to the current subject
+   * in the selected diploma. The requirement object contains a unique id, a name,
+   * and credits set to 0.
+   */
   const handleNewRequirement = () => {
     const newReq = {
       _id: `${Math.floor(Date.now() / 1000).toString(16)}${Array(16)
@@ -63,6 +72,11 @@ const Diploma = () => {
     );
   };
 
+  /**
+   * Deletes a requirement from the current subject
+   * in the selected diploma based on the provided requirement id.
+   * @param {string} id - The id of the requirement to be deleted.
+   */
   const handleRequirementDelete = (id) => {
     setDiplomas(
       diplomas.map((d) =>
@@ -83,6 +97,11 @@ const Diploma = () => {
     );
   };
 
+  /**
+   * Deletes a requirement from the current subject
+   * in the selected diploma based on the provided requirement id.
+   * @param {string} id - The id of the requirement to be deleted.
+   */
   const handleRequirementChange = (e, reqId) => {
     if (e.target.id == "name") {
       setDiplomas(

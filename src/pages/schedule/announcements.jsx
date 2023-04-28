@@ -14,6 +14,11 @@ export default function AnnouncementPage() {
     });
   }, []);
 
+  /**
+   * Submits a new announcement and sends it to the backend.
+   * Upon successful submission, clears the input fields and adds the new announcement to the state.
+   * @param {Event} e - The submit event triggered by the form.
+   */
   const handleSubmit = (e) => {
     const newBody = {
       Date: new Date(e.target[0].value).toLocaleDateString("en-US", {
@@ -44,8 +49,11 @@ export default function AnnouncementPage() {
       })
     );
   };
-  console.log(announcements);
 
+  /**
+   * Deletes an announcement from the backend and removes it from the state.
+   * @param {string} id - The id of the announcement to be deleted.
+   */
   const handleDelete = (id) => {
     fetch("/api/schedule/announcements/", {
       method: "DELETE",

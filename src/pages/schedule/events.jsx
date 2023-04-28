@@ -16,13 +16,12 @@ export default function EventPage() {
   useEffect(() => {
     fetch("/api/schedule/events").then((res) => {
       res.json().then((data) => {
-        setEvents(data);
+        setEvents(data.reverse());
       });
     });
 
     fetch("/api/schedule/special").then((res) => {
       res.json().then((data) => {
-        console.log(data);
         setSpecialSchedules(data);
         setNewEvent((prev) => ({
           ...prev,
@@ -32,6 +31,11 @@ export default function EventPage() {
     });
   }, []);
 
+  /**
+   * Handles form input changes and updates the state accordingly.
+   * For 'noSchool' checkbox, it sets or removes the 'NoSchoolText' property from the newEvent object.
+   * @param {Event} e - The change event triggered by the form input.
+   */
   const handleFormChange = (e) => {
     if (e.target.id == "noSchool") {
       if (e.target.checked) {
@@ -50,7 +54,7 @@ export default function EventPage() {
             ...newEvent,
           };
         });
-        console.log(newEvent);
+
         return;
       }
     }
@@ -61,9 +65,13 @@ export default function EventPage() {
         [e.target.id]: e.target.value,
       };
     });
-    console.log(newEvent);
   };
 
+  /**
+   * Submits a new event and sends it to the backend.
+   * Upon successful submission, clears the input fields and adds the new event to the state.
+   * @param {Event} e - The submit event triggered by the form.
+   */
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -72,7 +80,15 @@ export default function EventPage() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(newEvent),
+      body: JSON.stringify({
+        ...newEvent,
+        Date: new Date(newEvent.Date).toLocaleDateString("en-US", {
+          month: "numeric",
+          day: "numeric",
+          year: "numeric",
+          timeZone: "UTC",
+        }),
+      }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -86,12 +102,28 @@ export default function EventPage() {
           });
 
           setEvents((prev) => {
-            return [...prev, { ...newEvent, _id: data._id }];
+            return [
+              ...prev,
+              {
+                ...newEvent,
+                Date: new Date(newEvent.Date).toLocaleDateString("en-US", {
+                  month: "numeric",
+                  day: "numeric",
+                  year: "numeric",
+                  timeZone: "UTC",
+                }),
+                _id: data._id,
+              },
+            ];
           });
         }
       });
   };
 
+  /**
+   * Deletes an event from the backend and removes it from the state.
+   * @param {string} id - The id of the event to be deleted.
+   */
   const handleDelete = (id) => {
     fetch("/api/schedule/events/", {
       method: "DELETE",
@@ -226,7 +258,7 @@ export default function EventPage() {
               >
                 <h1 className="mb-1">No School Text:</h1>
                 <input
-                  required
+                  required={newEvent.NoSchoolText != null}
                   id="NoSchoolText"
                   type="text"
                   value={newEvent.NoSchoolText}
