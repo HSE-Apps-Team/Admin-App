@@ -261,8 +261,18 @@ export default function CoursePage() {
                   <h1 className="text-sm mb-1">
                     {course.grade_level.join(" | ")}
                   </h1>
-
-                  <h1 className="text-sm w-fit">{course.description}</h1>
+                  <h1 className="text-sm w-fit">
+                    <span className="font-thin">Requirements:</span>{" "}
+                    {course.requirements}
+                  </h1>
+                  <h1 className="text-sm w-fit">
+                    <span className="font-thin">Description:</span>{" "}
+                    {course.description}
+                  </h1>
+                  <h1 className="text-sm w-fit">
+                    <span className="font-thin">Additional Info:</span>{" "}
+                    {course.additional_info}
+                  </h1>
                 </div>
               ))}
           </div>
@@ -288,7 +298,12 @@ export default function CoursePage() {
               </div>
               <div>
                 <h1 className="mb-1">Description:</h1>
-                <textarea id="description" className="w-full pb-32" />
+                <textarea
+                  id="description"
+                  className="w-full pb-32"
+                  value={selectedCourse.description}
+                  onChange={handleCourseEdit}
+                />
               </div>
               <div>
                 <h1 className="mb-1">Additional Info:</h1>
@@ -296,7 +311,7 @@ export default function CoursePage() {
                   id="description"
                   type="text"
                   className="rounded-md w-full py-1 px-1"
-                  value={selectedCourse.description}
+                  value={selectedCourse.additional_info}
                   onChange={handleCourseEdit}
                 />
               </div>

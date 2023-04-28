@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
@@ -35,10 +35,11 @@ export default function App({ Component, pageProps }) {
       <div className="w-full px-5">
         <h1 className="mt-3 mb-2">Enter Password:</h1>
         <input
+          type="password"
           onChange={(e) => {
             checkPass(e.target.value);
           }}
-          className="w-full bg-gray-200 rounded-lg py-2"
+          className="w-full bg-gray-200 rounded-lg py-2 px-3"
         ></input>
       </div>
     );
@@ -69,11 +70,6 @@ export default function App({ Component, pageProps }) {
               Courses Admin
             </button>
           </Link>
-          {/* <Link href="/clubs">
-            <button className="px-5 py-3 bg-blue-600 rounded-lg hover:bg-blue-500">
-              Clubs Admin
-            </button>
-          </Link> */}
         </div>
       </>
     );
