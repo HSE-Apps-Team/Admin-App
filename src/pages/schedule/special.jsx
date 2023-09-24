@@ -256,6 +256,7 @@ export default function SpecialSchedules() {
             </div>
             {schedules.map((schedule) => (
               <div
+                key={schedule._id}
                 onClick={() => {
                   handleSwitchSelected(schedule._id);
                 }}
@@ -358,7 +359,7 @@ export default function SpecialSchedules() {
                 </div>
                 {period.lunchPeriods &&
                   Object.keys(period.lunchPeriods).map((lunchType) => (
-                    <div className="ml-5">
+                    <div key={lunchType} className="ml-5">
                       <h1 className="text-lg text-blue-400 mt-2">
                         {lunchType} Lunch
                       </h1>

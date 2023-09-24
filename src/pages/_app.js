@@ -106,7 +106,7 @@ export default function App({ Component, pageProps }) {
                 </h1>
               </div>
               {menuData[router.pathname.split("/")[1]].items.map((item) => (
-                <Link href={item.href}>
+                <Link key={item.href} href={item.href}>
                   <div
                     className={`rounded-lg px-3 py-5 mt-2 cursor-pointer ${
                       router.pathname != item.href && "hover:bg-slate-50"

@@ -93,7 +93,7 @@ export default function MainSchedule() {
       </Head>
       <div className="flex w-full flex-nowrap justify-around mb-8">
         {mainSchedules.map((schedule, index) => (
-          <div className="flex flex-col">
+          <div key={schedule._id} className="flex flex-col">
             <h1 className="font-semibold text-xl text-center">
               {schedule.Type}
             </h1>
@@ -125,7 +125,7 @@ export default function MainSchedule() {
                 </div>
                 {period.lunchPeriods &&
                   Object.keys(period.lunchPeriods).map((lunchType) => (
-                    <div className="ml-5">
+                    <div key={lunchType} className="ml-5">
                       <h1 className="text-lg text-blue-400 mt-2 mb-1">
                         {lunchType} Lunch
                       </h1>

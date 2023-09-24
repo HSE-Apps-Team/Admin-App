@@ -12,6 +12,22 @@ The HSE Admin App is a comprehensive web application designed specifically for s
 6. **Subjects and Tags Management**: Add, edit, and delete subjects and tags associated with courses. Update related course documents when subjects or tags are updated or deleted.
 7. **Diploma Programs Management**: View, add, edit, and delete diploma programs. Update diploma program data for the entire collection at once.
 
+## Prerequisites
+
+Before running the HSE Admin App, make sure you have the following environment variables set:
+
+- `COURSES_MONGODB_URI`: The connection URI for the MongoDB instance holding course-related data.
+- `SCHEDULE_MONGODB_URI`: The connection URI for the MongoDB instance holding schedule-related data.
+
+These variables should be placed in a `.env.local` file at the root of the project.
+
+Example:
+
+```bash
+COURSES_MONGODB_URI=mongodb://username:password@host:port/database?options
+SCHEDULE_MONGODB_URI=mongodb://username:password@host:port/database?options
+```
+
 ## How to run the app
 
 HSE Admin App is built with Next.js. To run the app, follow these steps:

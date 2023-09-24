@@ -228,6 +228,7 @@ export default function CoursePage() {
               )
               .map((course) => (
                 <div
+                  key={course._id}
                   className={`py-2 px-5 bg-gray-100 rounded-lg mb-3 hover:bg-gray-200 cursor-pointer ${
                     selectedCourse._id == course._id && "bg-gray-300"
                   }`}

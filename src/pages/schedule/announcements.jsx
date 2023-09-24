@@ -136,7 +136,10 @@ export default function AnnouncementPage() {
           <div>
             <h1 className="text-lg font-semibold mb-2">Announcements</h1>
             {announcements.map((announcement) => (
-              <div className="py-2 px-5 bg-gray-100 rounded-lg mb-3">
+              <div
+                key={announcement._id}
+                className="py-2 px-5 bg-gray-100 rounded-lg mb-3"
+              >
                 <div className="flex gap-x-3 items-center">
                   <h1 className="text-lg font-light">{announcement.Title}</h1>
                   <svg

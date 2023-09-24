@@ -182,6 +182,7 @@ const Diploma = () => {
             </h1>
             {diplomas.map((diploma) => (
               <div
+                key={diploma._id}
                 onClick={() => setSelectedDiploma(diploma._id)}
                 className={`py-2 px-5 bg-gray-100 hover:cursor-pointer hover:bg-gray-200 rounded-lg mb-3 ${
                   selectedDiploma == diploma._id && "bg-gray-300"
@@ -208,6 +209,7 @@ const Diploma = () => {
                 .find((a) => a._id == selectedDiploma)
                 .subjects.map((subject) => (
                   <div
+                    key={subject._id}
                     onClick={() => setSelectedSubject(subject._id)}
                     className={`py-2 px-5 bg-gray-100 hover:cursor-pointer hover:bg-gray-200 rounded-lg mb-3 ${
                       selectedSubject == subject._id && "bg-gray-300"
@@ -258,6 +260,7 @@ const Diploma = () => {
                   ?.subjects.find((a) => a._id == selectedSubject)
                   ?.requirements.map((requirement) => (
                     <div
+                      key={requirement._id}
                       className={`w-full py-2 px-5 bg-gray-100 rounded-lg mb-3`}
                     >
                       <div className="w-full flex gap-x-3 items-center justify-between">

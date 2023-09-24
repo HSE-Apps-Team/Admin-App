@@ -189,7 +189,10 @@ const Subjects = () => {
                 <h1 className="text-lg font-light">New Subject</h1>
               </div>
               {subjects.map((subject) => (
-                <div className="w-full py-2 px-5 bg-gray-100 rounded-lg mb-3 ">
+                <div
+                  key={subject._id}
+                  className="w-full py-2 px-5 bg-gray-100 rounded-lg mb-3 "
+                >
                   <div className="w-full flex gap-x-3 items-center justify-between">
                     <div className="w-full">
                       <input
@@ -276,7 +279,10 @@ const Subjects = () => {
               <h1 className="text-lg font-light">New Tag</h1>
             </div>
             {tags.map((tag) => (
-              <div className={`w-full py-2 px-5 bg-gray-100 rounded-lg mb-3`}>
+              <div
+                key={tag._id}
+                className={`w-full py-2 px-5 bg-gray-100 rounded-lg mb-3`}
+              >
                 <div className="w-full flex gap-x-3 items-center justify-between">
                   <div className="w-full">
                     <input

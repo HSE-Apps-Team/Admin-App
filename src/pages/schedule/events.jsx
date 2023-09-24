@@ -164,8 +164,14 @@ export default function EventPage() {
           <h1 className="text-lg font-semibold mb-2">Events</h1>
           <div>
             {events.map((event) => (
-              <div className="py-2 px-5 bg-gray-100 rounded-lg mb-3">
-                <div className="flex justify-between items-center">
+              <div
+                key={event._id}
+                className="py-2 px-5 bg-gray-100 rounded-lg mb-3"
+              >
+                <div
+                  key={event._id}
+                  className="flex justify-between items-center"
+                >
                   <h1 className="text-lg font-light">{event.Title}</h1>
                   <svg
                     onClick={() => handleDelete(event._id)}
@@ -278,7 +284,9 @@ export default function EventPage() {
                   disabled={newEvent.NoSchoolText != null}
                 >
                   {specialSchedules.map((schedule) => (
-                    <option value={schedule.Name}>{schedule.Name}</option>
+                    <option key={schedule.Name} value={schedule.Name}>
+                      {schedule.Name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -296,7 +304,10 @@ export default function EventPage() {
                 .filter((schedule) => schedule.Name === newEvent.ScheduleName)
                 .map((schedule) => {
                   return (
-                    <div className="flex flex-col items-center">
+                    <div
+                      key={schedule.Name}
+                      className="flex flex-col items-center"
+                    >
                       <h1 className="text-lg font-light mb-3">
                         {schedule.Name} - {schedule.SpecialType}
                       </h1>
@@ -313,7 +324,7 @@ export default function EventPage() {
                               {period.lunchPeriods &&
                                 Object.keys(period.lunchPeriods).map((key) => {
                                   return (
-                                    <div className="ml-5">
+                                    <div key={key} className="ml-5">
                                       <h1 className="text-sm font-semibold">
                                         {key} Lunch
                                       </h1>
