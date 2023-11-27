@@ -83,7 +83,7 @@ export default function EventPage() {
       },
       body: JSON.stringify({
         ...newEvent,
-        StartDate: new Date(newEvent.Date).toLocaleDateString("en-US", {
+        Date: new Date(newEvent.Date).toLocaleDateString("en-US", {
           month: "numeric",
           day: "numeric",
           year: "numeric",
@@ -99,10 +99,12 @@ export default function EventPage() {
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log(newEvent.Date +" "+ newEvent.EndDate);
         if (data._id) {
           alert("Event Successfully Added!");
           setNewEvent({
             Date: "",
+            EndDate: "",
             Title: "",
             Description: "",
             ScheduleName: specialSchedules[0].Name,
@@ -114,6 +116,12 @@ export default function EventPage() {
               {
                 ...newEvent,
                 Date: new Date(newEvent.Date).toLocaleDateString("en-US", {
+                  month: "numeric",
+                  day: "numeric",
+                  year: "numeric",
+                  timeZone: "UTC",
+                }),
+                EndDate: new Date(newEvent.EndDate).toLocaleDateString("en-US",{
                   month: "numeric",
                   day: "numeric",
                   year: "numeric",
@@ -197,6 +205,7 @@ export default function EventPage() {
                   </svg>
                 </div>
                 <h1 className="text-sm mb-1">{event.Date}</h1>
+                <h1 className="text-sm mb-1">{event.EndDate}</h1>
                 <h1 className="text-sm">
                   <span className="font-semibold">Schedule:</span>{" "}
                   {event.ScheduleName}
