@@ -7,6 +7,7 @@ export default function EventPage() {
   const [events, setEvents] = useState(null);
   const [newEvent, setNewEvent] = useState({
     Date: "",
+    EndDate: "",
     Title: "",
     Description: "",
     ScheduleName: "",
@@ -82,7 +83,13 @@ export default function EventPage() {
       },
       body: JSON.stringify({
         ...newEvent,
-        Date: new Date(newEvent.Date).toLocaleDateString("en-US", {
+        StartDate: new Date(newEvent.Date).toLocaleDateString("en-US", {
+          month: "numeric",
+          day: "numeric",
+          year: "numeric",
+          timeZone: "UTC",
+        }),
+        EndDate: new Date(newEvent.EndDate).toLocaleDateString("en-US", {
           month: "numeric",
           day: "numeric",
           year: "numeric",
@@ -216,12 +223,23 @@ export default function EventPage() {
             <h1 className="text-lg font-semibold mb-3">New Event</h1>
             <div className="flex flex-col gap-y-2 ">
               <div>
-                <h1 className="mb-1">Date:</h1>
+                <h1 className="mb-1">Start Date:</h1>
                 <input
                   required
                   id="Date"
                   type="date"
                   value={newEvent.Date}
+                  className="rounded-md py-1 "
+                  onChange={handleFormChange}
+                />
+              </div>
+              <div>
+                <h1 className="mb-1">EndDate:</h1>
+                <input
+                  required
+                  id="EndDate"
+                  type="date"
+                  value={newEvent.EndDate}
                   className="rounded-md py-1 "
                   onChange={handleFormChange}
                 />
