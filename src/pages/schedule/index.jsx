@@ -172,7 +172,7 @@ export default function MainSchedule() {
           className="py-2 px-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-lg mr-2"
           onClick={handleReset}
         >
-          Reset Cache
+          Swap Days
         </button>
         <button
           className="py-2 px-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-lg"
