@@ -309,7 +309,7 @@ export default function CoursePage() {
               <div>
                 <h1 className="mb-1">Additional Info:</h1>
                 <input
-                  id="description"
+                  id="additional_info"
                   type="text"
                   className="rounded-md w-full py-1 px-1"
                   value={selectedCourse.additional_info}
