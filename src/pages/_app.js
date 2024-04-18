@@ -17,6 +17,7 @@ export default function App({ Component, pageProps }) {
     const data = encoder.encode(text);
     const digest = await crypto.subtle.digest("SHA-256", data);
 
+   
     const guess = Array.from(new Uint8Array(digest))
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
@@ -29,6 +30,8 @@ export default function App({ Component, pageProps }) {
       console.log("Valid");
     }
   };
+
+
 
   if (!validUser) {
     return (
@@ -46,6 +49,7 @@ export default function App({ Component, pageProps }) {
   }
 
   if (router.pathname == "/" && validUser) {
+    
     return (
       <>
         <Navbar />
@@ -76,6 +80,8 @@ export default function App({ Component, pageProps }) {
   }
 
   if (validUser)
+  console.log("hi"); 
+  console.log(menuData[router.pathname.split("/")[1]]);
     return (
       <>
         <Navbar />

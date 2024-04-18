@@ -18,10 +18,16 @@ const menuData = {
         description: "Create new events that use special schedules",
         href: "/schedule/events",
       },
+     
       {
         title: "Announcements",
         description: "Create announcements that appear on the schedule app",
         href: "/schedule/announcements",
+      },
+      {
+        title: "Calendar",
+        description: "Edit the calendar and summer clock",
+        href: "/schedule/calendar",
       },
     ],
   },
