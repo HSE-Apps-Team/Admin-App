@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import ReactLoading from 'react-loading';
+import CalendarImage from './Calendar/CalendarImage';
 
 export default function CalendarEditor() {
   //image uploader
@@ -57,55 +58,6 @@ export default function CalendarEditor() {
     );
   }
 
-  
-
-  
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImageUrl(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!image) {
-      alert('Please select an image before submitting.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const body = JSON.stringify({
-        id: "6617067453189d6d75cb0fb8", // This is the hardcoded ID to update
-        newImgUrl: reader.result
-      });
-
-      const response = await fetch('/api/schedule/calendar', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: body
-      });
-
-      if (response.ok) {
-        alert('Image updated successfully!');
-      } else {
-        const errorData = await response.json();
-        alert('Failed to update image: ' + errorData.message);
-      }
-    };
-    reader.readAsDataURL(image); // This triggers the reader.onload
-  };
-
   const handleSubmitClock = async (e) => {
     e.preventDefault();
   
@@ -140,31 +92,8 @@ export default function CalendarEditor() {
     </Head>
     <div className="container mx-auto mt-4 p-4">
       <div className="flex">
-        <div className="flex flex-col items-center">
-          <h1 className="text-2xl font-semibold mb-4">Calendar Image Editor</h1>
-          {imageUrl ? (
-            <img src={imageUrl} alt="Calendar" className="mb-2" style={{ width: '250px', height: '375px' }} />
-          ) : (
             <div className="mb-2 bg-gray-300" style={{ width: '150px', height: '150px' }}>No Image Available</div>
-          )}
-          <label htmlFor="imageUpload" className="block text-sm font-medium text-gray-700">
-            Upload Image
-          </label>
-          <input
-            id="imageUpload"
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="mt-1 p-2 border rounded-md"
-          />
-           <button
-            onClick={handleSubmit}
-            className="py-2 px-4 mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-md self-end"
-          >
-            Upload Image
-          </button>
-        </div>
-       
+        <CalendarImage/>
         <div className="flex flex-col">
           <h1 className="text-2xl font-semibold mb-4">Break Clock Editor</h1>
           <input
