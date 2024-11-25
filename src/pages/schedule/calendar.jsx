@@ -92,7 +92,6 @@ export default function CalendarEditor() {
     </Head>
     <div className="container mx-auto mt-4 p-4">
       <div className="flex">
-            <div className="mb-2 bg-gray-300" style={{ width: '150px', height: '150px' }}>No Image Available</div>
         <CalendarImage/>
         <div className="flex flex-col">
           <h1 className="text-2xl font-semibold mb-4">Break Clock Editor</h1>
