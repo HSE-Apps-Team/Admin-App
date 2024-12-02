@@ -6,56 +6,80 @@ import connectDB from "@/lib/schedule.db";
 
 // Define the handler function for the API route
 export default async function handler(req, res) {
-  // Connect to the database using the connectDB function
+  // Connect to the database
   const client = await connectDB();
-  // Access the "Data" database
   const db = client.db("Data");
-  // Access the "Calendar" collection within the "Data" database
-  const collection = db.collection("Calendar");
+  const collection = db.collection("Images");
 
-  if (req.method === "POST") {
-    // Retrieve the id and the new image URL from the request body
-    const { id = "6617067453189d6d75cb0fb8", newImgUrl } = req.body;
+  try {
+    if (req.method === "GET") {
+      console.log("GET");
+      // Fetch all images
+      const images = await collection.find({}).toArray();
+      res.status(200).json(images);
+    } else if (req.method === "POST") {
+      // Create a new image entry
+      const imgUrl = req.body.image;
+      const name = req.body.name;
+      console.log(req.body);
 
-    // Validate the incoming newImgUrl
-    if (!newImgUrl) {
-      res.status(400).json({ message: "No new image URL provided" });
-      return;
+      if (!imgUrl) {
+        console.log(imgUrl);
+        res.status(400).json({ message: "Image URL is required" });
+        return;
+      }
+
+      const result = await collection.insertOne({ imgUrl, createdAt: new Date(), name });
+      res.status(201).json({
+        message: "Image added successfully",
+        insertedId: result.insertedId,
+      });
+    } else if (req.method === "PUT") {
+      // Update an image's URL
+      const { id, newImgUrl } = req.body;
+      if (!id || !newImgUrl) {
+        res.status(400).json({ message: "Image ID and new URL are required" });
+        return;
+      }
+
+      const result = await collection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { imgUrl: newImgUrl, updatedAt: new Date() } }
+      );
+
+      if (result.matchedCount === 0) {
+        res.status(404).json({ message: "Image not found" });
+        return;
+      }
+
+      res.status(200).json({
+        message: "Image updated successfully",
+        updatedCount: result.modifiedCount,
+      });
+    } else if (req.method === "DELETE") {
+      // Delete an image by ID
+      const { id } = req.body;
+      if (!id) {
+        res.status(400).json({ message: "Image ID is required" });
+        return;
+      }
+
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+
+      if (result.deletedCount === 0) {
+        res.status(404).json({ message: "Image not found" });
+        return;
+      }
+
+      res.status(200).json({ message: "Image deleted successfully" });
+    } else {
+      res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
+      res.status(405).json({ message: `Method ${req.method} not allowed` });
     }
-
-    // Update the calendar_img field in the document
-    const updateResult = await collection.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { calendar_img: newImgUrl } },
-      { upsert: false } // Ensures no new document is created if one doesn't already exist
-    );
-
-    if (updateResult.matchedCount === 0) {
-      res.status(404).json({ message: "Calendar not found for update" });
-      return;
-    }
-
-    // Return a success message if the document was updated
-    res.status(200).json({ message: "Calendar image updated", updatedCount: updateResult.modifiedCount });
-  } else if (req.method === "GET") {
-    // Define the id of the calendar document to read
-    const id = "6617067453189d6d75cb0fb8";
-
-    // Retrieve the calendar document using the specified id
-    const calendar = await collection.findOne({ _id: new ObjectId(id) });
-
-    // Check if the calendar document was found
-    if (!calendar) {
-      res.status(404).json({ message: "Calendar not found" });
-      return;
-    }
-
-    // Return the found calendar document
-    res.status(200).json(calendar);
-  }
-
-  // Close the database connection after a short delay (1500ms)
-  setTimeout(() => {
+  } catch (error) {
+    console.error("Error managing images collection:", error);
+    res.status(500).json({ message: "Internal server error" });
+  } finally {
     client.close();
-  }, 1500);
+  }
 }
