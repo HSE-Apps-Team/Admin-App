@@ -19,15 +19,17 @@ export default async function handler(req, res) {
       res.status(200).json(images);
     } else if (req.method === "POST") {
       // Create a new image entry
-      const { imgUrl } = req.body;
-      console.log(req);
+      const imgUrl = req.body.image;
+      const name = req.body.name;
+      console.log(req.body);
+
       if (!imgUrl) {
         console.log(imgUrl);
         res.status(400).json({ message: "Image URL is required" });
         return;
       }
 
-      const result = await collection.insertOne({ imgUrl, createdAt: new Date() });
+      const result = await collection.insertOne({ imgUrl, createdAt: new Date(), name });
       res.status(201).json({
         message: "Image added successfully",
         insertedId: result.insertedId,

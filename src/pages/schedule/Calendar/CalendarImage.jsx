@@ -5,6 +5,7 @@ const CalendarImage = () => {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
+  const [name, setName] = useState('');
 
   // Fetch all images on component load
   useEffect(() => {
@@ -38,6 +39,10 @@ const CalendarImage = () => {
     }
   };
 
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -51,6 +56,7 @@ const CalendarImage = () => {
     const reader = new FileReader();
     reader.onload = async () => {
       const imgUrl = reader.result;
+      formData.append('name', name);
       formData.append('imgUrl', imgUrl);
 
     try {
@@ -59,7 +65,7 @@ const CalendarImage = () => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body : JSON.stringify({imgUrl})
+            body : JSON.stringify({image: imgUrl, name: name})
         });
 
         if (response.ok) {
@@ -122,6 +128,7 @@ const CalendarImage = () => {
           onChange={handleImageChange}
           className="mt-2 p-2 border rounded-md"
         />
+        <input type="text" placeholder="Image Name" value={name} onChange={handleNameChange} className="mt-2 p-2 border rounded-md" />
         <button
           onClick={handleSubmit}
           disabled={loading}
