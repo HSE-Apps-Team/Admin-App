@@ -10,7 +10,6 @@ export default function handler(req, res) {
   const { password } = req.body;
   
   // Use environment variable for password with no fallback
-  // This forces you to set up a secure password in your environment variables
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
   
   // Ensure password is configured
@@ -25,7 +24,7 @@ export default function handler(req, res) {
   }
 
   // If authentication is successful, set a cookie with the token
-  const token = generateToken(); // You may want to use a JWT library here
+  const token = generateToken(); // 
   
   // Set cookie
   res.setHeader('Set-Cookie', serialize('adminToken', token, {
