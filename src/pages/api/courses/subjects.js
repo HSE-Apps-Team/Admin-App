@@ -2,7 +2,7 @@
 import { ObjectId } from "mongodb";
 
 // Import the connectDB function from the custom database connection library
-import connectDB from "@/lib/courses.db";
+import connectDB from "../../../lib/courses.db";
 
 // Define the handler function for the API route
 export default async function handler(req, res) {

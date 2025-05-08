@@ -1,5 +1,5 @@
 // Import the custom database connection library
-import connectDB from "@/lib/schedule.db";
+import connectDB from "../../../lib/schedule.db";
 
 // Define the handler function for the API route
 export default async function handler(req, res) {

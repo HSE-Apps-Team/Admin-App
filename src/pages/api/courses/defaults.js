@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 
-import connectDB from "@/lib/courses.db";
+import connectDB from "../../../lib/courses.db";
 
 export default async function handler(req, res) {
   const client = await connectDB();
