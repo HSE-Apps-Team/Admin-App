@@ -1,55 +1,19 @@
-import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
 import "@/styles/globals.css";
 
-import Navbar from "@/components/Navbar";
+import Navbar from "../../Navbar";  // Updated import path
 
-import menuData from "@/menudata";
+// Try to import menuData safely
+import menuData from "../menudata";
+
 
 export default function App({ Component, pageProps }) {
-  const [validUser, setValidUser] = useState(false);
   const router = useRouter();
 
-  const checkPass = async (text) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(text);
-    const digest = await crypto.subtle.digest("SHA-256", data);
-
-   
-    const guess = Array.from(new Uint8Array(digest))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-
-    if (
-      guess ==
-      "a950c4ec34f2eff78dbae4166fb0d3d1319946931665b360ce94d0c63c683b6e"
-    ) {
-      setValidUser(true);
-      console.log("Valid");
-    }
-  };
-
-
-
-  if (!validUser) {
-    return (
-      <div className="w-full px-5">
-        <h1 className="mt-3 mb-2">Enter Password:</h1>
-        <input
-          type="password"
-          onChange={(e) => {
-            checkPass(e.target.value);
-          }}
-          className="w-full bg-gray-200 rounded-lg py-2 px-3"
-        ></input>
-      </div>
-    );
-  }
-
-  if (router.pathname == "/" && validUser) {
-    
+  // Home page
+  if (router.pathname === "/") {
     return (
       <>
         <Navbar />
@@ -79,14 +43,17 @@ export default function App({ Component, pageProps }) {
     );
   }
 
-  if (validUser)
-  console.log("hi"); 
-  console.log(menuData[router.pathname.split("/")[1]]);
-    return (
-      <>
-        <Navbar />
+  // Section pages with sidebar menu
+  const currentSection = router.pathname.split("/")[1];
+  // Check if the current path has corresponding menu data
+  const hasMenuData = currentSection && menuData[currentSection];
 
-        <div className="flex mt-5 w-100vw">
+  return (
+    <>
+      <Navbar />
+
+      <div className="flex mt-5 w-100vw">
+        {hasMenuData && (
           <div className="min-w-[20rem] w-[15%]">
             <div className="bg-slate-100 mx-5 rounded-lg px-3 py-3">
               <div className="flex items-center gap-x-3 mb-5">
@@ -95,23 +62,23 @@ export default function App({ Component, pageProps }) {
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
-                    stroke-width="1.5"
+                    strokeWidth="1.5"
                     stroke="currentColor"
                     className="h-5 text-blue-600 hover:text-blue-500 hover:cursor-pointer"
                   >
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
                     />
                   </svg>
                 </Link>
 
                 <h1 className="font-light text-lg">
-                  {menuData[router.pathname.split("/")[1]].title}
+                  {menuData[currentSection]?.title}
                 </h1>
               </div>
-              {menuData[router.pathname.split("/")[1]].items.map((item) => (
+              {menuData[currentSection]?.items?.map((item) => (
                 <Link key={item.href} href={item.href}>
                   <div
                     className={`rounded-lg px-3 py-5 mt-2 cursor-pointer ${
@@ -127,8 +94,11 @@ export default function App({ Component, pageProps }) {
               ))}
             </div>
           </div>
+        )}
+        <div className={hasMenuData ? "flex-1" : "w-full"}>
           <Component {...pageProps} />
         </div>
-      </>
-    );
+      </div>
+    </>
+  );
 }
