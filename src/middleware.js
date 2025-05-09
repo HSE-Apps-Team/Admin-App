@@ -13,9 +13,9 @@ export function middleware(request) {
   response.headers.set('x-middleware-method', method);
   
   // Allow all API requests except auth to bypass middleware protection
-  if (path.startsWith('/api') && !path.startsWith('/api/auth')) {
-    return response;
-  }
+  // if (path.startsWith('/api') && !path.startsWith('/api/auth')) {
+  //   return response;
+  // }
   
   // Define which paths are protected (require authentication)
   const isProtectedRoute = 
