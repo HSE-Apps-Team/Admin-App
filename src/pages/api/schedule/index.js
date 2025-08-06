@@ -19,15 +19,17 @@ export default async function handler(req, res) {
   else if (req.method == "PUT") {
     const schedule = req.body;
 
-    // Loop through each day in the schedule array
-    schedule.map(async (day) => {
-      // Update or insert the schedule for the specified day
-      await collection.updateOne(
-        { Type: day.Type },
-        { $set: { data: day.data } },
-        { upsert: true }
-      );
-    });
+    // Wait for all updates to complete before responding
+    await Promise.all(
+      schedule.map(async (day) => {
+        // Update or insert the schedule for the specified day
+        return collection.updateOne(
+          { Type: day.Type },
+          { $set: { data: day.data } },
+          { upsert: true }
+        );
+      })
+    );
 
     // Return a success message
     res.status(200).json({ message: "Schedule updated" });
