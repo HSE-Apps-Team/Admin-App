@@ -18,6 +18,7 @@ Before running the HSE Admin App, make sure you have the following environment v
 
 - `COURSES_MONGODB_URI`: The connection URI for the MongoDB instance holding course-related data.
 - `SCHEDULE_MONGODB_URI`: The connection URI for the MongoDB instance holding schedule-related data.
+- `ADMIN_PASSWORD`: the password to get in
 
 These variables should be placed in a `.env.local` file at the root of the project.
 
@@ -26,6 +27,7 @@ Example:
 ```bash
 COURSES_MONGODB_URI=mongodb://username:password@host:port/database?options
 SCHEDULE_MONGODB_URI=mongodb://username:password@host:port/database?options
+ADMIN_PASSWORD=testPassword
 ```
 
 ## How to run the app
