@@ -1,6 +1,34 @@
+import React, { useEffect, useState } from 'react';
 import CalendarDay from './Day';
 
-const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSelectedEndDate }) => {
+const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSelectedEndDate, refreshHelper }) => {
+    const [dayCache, setDayCache] = useState([]);
+
+    useEffect(() => {
+        const fetchDayCache = async () => {
+            const year = month.getFullYear();
+            const monthIndex = month.getMonth() + 1; // API expects 1-based month
+            try {
+                const res = await fetch(`/api/schedule/dayCache?month=${monthIndex}&year=${year}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    // Flatten days for easy lookup
+                    const daysMap = {};
+                    data.forEach(entry => {
+                        entry.days.forEach(d => {
+                            daysMap[`${entry.year}-${entry.month}-${d.day}`] = d.dayType;
+                        });
+                    });
+                    setDayCache(daysMap);
+                } else {
+                    setDayCache([]);
+                }
+            } catch {
+                setDayCache([]);
+            }
+        };
+        fetchDayCache();
+    }, [month, refreshHelper]);
     const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
     
     const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
@@ -25,34 +53,44 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
         // Add days from previous month
         for (let i = 0; i < daysFromPrevMonth; i++) {
             const day = prevMonthDays - daysFromPrevMonth + i + 1;
+            const prevMonth = monthIndex === 0 ? 11 : monthIndex - 1;
+            const prevYear = monthIndex === 0 ? year - 1 : year;
+            const key = `${prevYear}-${prevMonth + 1}-${day}`;
             days.push({
                 day,
                 month: monthIndex - 1,
                 year,
-                isCurrentMonth: false
+                isCurrentMonth: false,
+                dayType: dayCache[key] || undefined
             });
         }
-        
+
         // Add days from current month
         for (let i = 1; i <= daysInMonth; i++) {
+            const key = `${year}-${monthIndex + 1}-${i}`;
             days.push({
                 day: i,
                 month: monthIndex,
                 year,
-                isCurrentMonth: true
+                isCurrentMonth: true,
+                dayType: dayCache[key] || undefined
             });
         }
-        
+
         // Add days from next month
         for (let i = 1; i <= daysFromNextMonth; i++) {
+            const nextMonth = monthIndex === 11 ? 0 : monthIndex + 1;
+            const nextYear = monthIndex === 11 ? year + 1 : year;
+            const key = `${nextYear}-${nextMonth + 1}-${i}`;
             days.push({
                 day: i,
                 month: monthIndex + 1,
                 year,
-                isCurrentMonth: false
+                isCurrentMonth: false,
+                dayType: dayCache[key] || undefined
             });
         }
-        
+
         return days;
     };
 
@@ -114,6 +152,7 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
                             month={day.month}
                             year={day.year}
                             isCurrentMonth={day.isCurrentMonth}
+                            dayType={day.dayType}
                             selectedDate={selectedDate}
                             selectedEndDate={selectedEndDate}
                             onClick={() => handleDateClick(day.day, day.month, day.year)}
