@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 // get events from the api regarding what events are that day, incuding those starting ending, or overlapping with the selected date
 // if no events, show a message indicating no events are scheduled for the selected date
@@ -6,20 +6,35 @@ import React from 'react';
 // also allow for editing of events
 
 
-const EventEditor = ({selectedDate, selectedEndDate, setSelectedDate, setSelectedEndDate}) => {
+const EventEditor = ({selectedDate, selectedEndDate, setSelectedDate, setSelectedEndDate, refresh, refreshHelper}) => {
     const [events, setEvents] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
-    const [newEvent, setNewEvent] = React.useState({
+    const [newEvent, setNewEvent] = useState({
         title: '',
         description: '',
         startDate: selectedDate,
         endDate: selectedEndDate || selectedDate,
         isOffDay: false,
-        specialSchedule: false,
+        specialSchedule: null,
+        eventType: '',
     });
-    const [editingEvent, setEditingEvent] = React.useState(null);
+    const [editingEvent, setEditingEvent] = useState(null);
+    const [specialSchedules, setSpecialSchedules] = useState([]);
+    const [eventTypes, setEventTypes] = useState([]);
 
-    React.useEffect(() => {
+    // Fetch special schedules and event types from API
+    useEffect(() => {
+        fetch('/api/schedule/special')
+            .then(res => res.json())
+            .then(data => setSpecialSchedules(data))
+            .catch(() => setSpecialSchedules([]));
+        fetch('/api/schedule/eventTypes')
+            .then(res => res.json())
+            .then(data => setEventTypes(data))
+            .catch(() => setEventTypes([]));
+    }, [refreshHelper]);
+
+    useEffect(() => {
         const fetchEvents = async () => {
             try {
                 setLoading(true);
@@ -42,13 +57,13 @@ const EventEditor = ({selectedDate, selectedEndDate, setSelectedDate, setSelecte
             }
         };
         fetchEvents();
-    }, [selectedDate, selectedEndDate]);
+    }, [selectedDate, selectedEndDate, refreshHelper]);
 
     // Only update newEvent dates if form is empty (preserve progress)
-    React.useEffect(() => {
+    useEffect(() => {
         setNewEvent(prev => {
             // If any field except dates is filled, preserve progress
-            if (prev.title || prev.description || prev.isOffDay || prev.specialSchedule) {
+            if (prev.title || prev.description || prev.isOffDay || prev.specialSchedule || prev.eventType) {
                 return {
                     ...prev,
                     startDate: selectedDate,
@@ -62,7 +77,8 @@ const EventEditor = ({selectedDate, selectedEndDate, setSelectedDate, setSelecte
                     startDate: selectedDate,
                     endDate: selectedEndDate || selectedDate,
                     isOffDay: false,
-                    specialSchedule: false,
+                    specialSchedule: null,
+                    eventType: '',
                 };
             }
         });
@@ -80,6 +96,10 @@ const EventEditor = ({selectedDate, selectedEndDate, setSelectedDate, setSelecte
     }, [selectedDate, selectedEndDate]);
 
     const handleCreateEvent = async () => {
+        if (!newEvent.eventType) {
+            alert('Event type is required.');
+            return;
+        }
         try {
             // Use events2 API for creating
             const eventToCreate = {
@@ -100,8 +120,10 @@ const EventEditor = ({selectedDate, selectedEndDate, setSelectedDate, setSelecte
                 startDate: selectedDate,
                 endDate: selectedEndDate || selectedDate,
                 isOffDay: false,
-                specialSchedule: false,
+                specialSchedule: null,
+                eventType: '',
             });
+            refresh();
         } catch (error) {
             console.error('Error creating event:', error);
         }
@@ -109,6 +131,10 @@ const EventEditor = ({selectedDate, selectedEndDate, setSelectedDate, setSelecte
 
     const handleUpdateEvent = async () => {
         if (!editingEvent) return;
+        if (!editingEvent.eventType) {
+            alert('Event type is required.');
+            return;
+        }
         try {
             // Use events2 API for updating, send _id as id
             const response = await fetch('/api/schedule/events2', {
@@ -120,6 +146,7 @@ const EventEditor = ({selectedDate, selectedEndDate, setSelectedDate, setSelecte
             // No updated event returned, so update locally
             setEvents(events.map(event => event._id === editingEvent._id ? editingEvent : event));
             setEditingEvent(null);
+            refresh();
         } catch (error) {
             console.error('Error updating event:', error);
         }
@@ -139,6 +166,7 @@ const EventEditor = ({selectedDate, selectedEndDate, setSelectedDate, setSelecte
             if (editingEvent && editingEvent._id === eventId) {
                 setEditingEvent(null);
             }
+            refresh();
         } catch (error) {
             console.error('Error deleting event:', error);
         }
@@ -162,52 +190,93 @@ const EventEditor = ({selectedDate, selectedEndDate, setSelectedDate, setSelecte
                 <p className="text-gray-500">Loading events...</p>
             ) : filteredEvents.length > 0 ? (
                 <div className="events-list grid gap-4 mb-6">
-                    {filteredEvents.map(event => (
-                        <div
-                            key={event._id || event.id}
-                            className={`event-item border-l-4 p-4 rounded-md shadow-sm cursor-pointer transition-all duration-200 hover:scale-105 ${event.isOffDay ? 'border-red-500 bg-red-50' : event.specialSchedule ? 'border-yellow-500 bg-yellow-50' : 'border-blue-500 bg-white'}`}
-                            onClick={() => {
-                                setSelectedDate(event.startDate);
-                                setSelectedEndDate(event.endDate || event.startDate);
-                            }}
-                        >
-                            <div className="flex justify-between items-center">
-                                <h3 className="text-lg font-semibold text-gray-800">{event.title}</h3>
-                                <div className="flex gap-2">
-                                    <button
-                                        className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            setEditingEvent({
-                                                ...event,
-                                                endDate: event.endDate ? event.endDate : event.startDate
-                                            });
-                                        }}
-                                    >Edit</button>
-                                    <button
-                                        className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            handleDeleteEvent(event._id || event.id);
-                                        }}
-                                    >Delete</button>
+                    {filteredEvents.map(event => {
+                        // Find event type object
+                        const eventTypeObj = eventTypes.find(et => et.name === event.eventType);
+                        // Use event type color, fallback to blue
+                        const typeColor = eventTypeObj?.color || '#2196f3';
+                        // Create a tinted background (10% opacity)
+                        const bgTint = typeColor.startsWith('#')
+                            ? `${typeColor}1A`
+                            : `rgba(33,150,243,0.1)`;
+
+                        // Utility to get readable text color (black/white) based on background
+                        function getContrastYIQ(hexcolor) {
+                            let hex = hexcolor.replace('#', '');
+                            if (hex.length === 3) hex = hex.split('').map(x => x + x).join('');
+                            const r = parseInt(hex.substr(0,2),16);
+                            const g = parseInt(hex.substr(2,2),16);
+                            const b = parseInt(hex.substr(4,2),16);
+                            const yiq = ((r*299)+(g*587)+(b*114))/1000;
+                            return yiq >= 128 ? '#222' : '#fff';
+                        }
+                        const tagTextColor = getContrastYIQ(typeColor);
+
+                        return (
+                            <div
+                                key={event._id || event.id}
+                                className={`event-item border-l-4 p-4 rounded-md shadow-sm cursor-pointer transition-all duration-200 hover:scale-105`}
+                                style={{
+                                    borderLeftColor: typeColor,
+                                    background: bgTint
+                                }}
+                                onClick={() => {
+                                    setSelectedDate(event.startDate);
+                                    setSelectedEndDate(event.endDate || event.startDate);
+                                }}
+                            >
+                                <div className="flex justify-between items-center">
+                                    <h3 className="text-lg font-semibold text-gray-800">{event.title}</h3>
+                                    <div className="flex gap-2">
+                                        <button
+                                            className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                setEditingEvent({
+                                                    ...event,
+                                                    endDate: event.endDate ? event.endDate : event.startDate
+                                                });
+                                            }}
+                                        >Edit</button>
+                                        <button
+                                            className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                handleDeleteEvent(event._id || event.id);
+                                            }}
+                                        >Delete</button>
+                                    </div>
+                                </div>
+                                {event.description && (
+                                    <div className="text-sm text-gray-700 mt-2 mb-1">
+                                        <span className="font-medium">Description:</span> {event.description}
+                                    </div>
+                                )}
+                                <div className="text-sm text-gray-600 mt-1">
+                                    <span className="font-medium">Date:</span> {new Date(event.startDate).toLocaleDateString()}
+                                    {event.endDate && event.endDate !== event.startDate && (
+                                        <>
+                                            {' '} - {new Date(event.endDate).toLocaleDateString()}
+                                        </>
+                                    )}
+                                </div>
+                                <div className="mt-2 flex gap-2">
+                                    {event.isOffDay && <span className="px-2 py-1 bg-red-200 text-red-800 rounded text-xs">Off Day</span>}
+                                    {event.specialSchedule && <span className="px-2 py-1 bg-yellow-200 text-yellow-800 rounded text-xs">Special Schedule</span>}
+                                    {event.eventType && eventTypeObj && (
+                                        <span
+                                            className="px-2 py-1 rounded text-xs border"
+                                            style={{
+                                                background: typeColor + '33',
+                                                color: tagTextColor,
+                                                borderColor: typeColor
+                                            }}
+                                        >{event.eventType}</span>
+                                    )}
                                 </div>
                             </div>
-                            {event.description && (
-                                <div className="text-sm text-gray-700 mt-2 mb-1">
-                                    <span className="font-medium">Description:</span> {event.description}
-                                </div>
-                            )}
-                            <div className="text-sm text-gray-600 mt-1">
-                                <span className="font-medium">Start:</span> {new Date(event.startDate).toLocaleString()}<br />
-                                <span className="font-medium">End:</span> {new Date(event.endDate).toLocaleString()}
-                            </div>
-                            <div className="mt-2 flex gap-2">
-                                {event.isOffDay && <span className="px-2 py-1 bg-red-200 text-red-800 rounded text-xs">Off Day</span>}
-                                {event.specialSchedule && <span className="px-2 py-1 bg-yellow-200 text-yellow-800 rounded text-xs">Special Schedule</span>}
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             ) : (
                 <p className="text-gray-500">No events scheduled for this date.</p>
@@ -333,27 +402,65 @@ const EventEditor = ({selectedDate, selectedEndDate, setSelectedDate, setSelecte
                         />
                     </label>
                 </div>
+                <div className="mb-3 flex items-center gap-3">
+                    <label className="block font-medium mb-1">
+                        Event Type:
+                        <select
+                            className="ml-2 p-2 border rounded"
+                            required
+                            value={editingEvent ? (editingEvent.eventType || '') : (newEvent.eventType || '')}
+                            onChange={e => {
+                                const value = e.target.value;
+                                if (editingEvent) {
+                                    setEditingEvent({ ...editingEvent, eventType: value });
+                                } else {
+                                    setNewEvent({ ...newEvent, eventType: value });
+                                }
+                            }}
+                        >
+                            <option value="" disabled>Select event type</option>
+                            {eventTypes.map(et => (
+                                <option key={et._id} value={et.name}>{et.name}</option>
+                            ))}
+                        </select>
+                    </label>
+                    {/* Show color of selected event type */}
+                    {(() => {
+                        const selectedType = eventTypes.find(et => et.name === (editingEvent ? editingEvent.eventType : newEvent.eventType));
+                        return selectedType ? (
+                            <span className="w-6 h-6 rounded-full border" style={{ background: selectedType.color || '#2196f3', display: 'inline-block' }} title={selectedType.name}></span>
+                        ) : null;
+                    })()}
+                </div>
                 <div className="mb-3">
                     <label className="block font-medium mb-1">
                         Special Schedule:
-                        <input 
-                            type="checkbox" 
-                            className="ml-2"
-                            checked={editingEvent ? editingEvent.specialSchedule : newEvent.specialSchedule}
-                            onChange={(e) => {
+                        <select
+                            className="ml-2 p-2 border rounded"
+                            value={editingEvent ? (editingEvent.specialSchedule || '') : (newEvent.specialSchedule || '')}
+                            onChange={e => {
+                                const value = e.target.value === '' ? null : e.target.value;
                                 if (editingEvent) {
-                                    setEditingEvent({...editingEvent, specialSchedule: e.target.checked});
+                                    setEditingEvent({ ...editingEvent, specialSchedule: value });
                                 } else {
-                                    setNewEvent({...newEvent, specialSchedule: e.target.checked});
+                                    setNewEvent({ ...newEvent, specialSchedule: value });
                                 }
                             }}
-                        />
+                        >
+                            <option value="">No Special Schedule</option>
+                            {specialSchedules.map(sch => (
+                                <option key={sch._id} value={sch._id}>{sch.Name}</option>
+                            ))}
+                        </select>
                     </label>
                 </div>
                 {editingEvent ? (
                     <div className="flex gap-2 mt-4">
                         <button className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700" onClick={handleUpdateEvent}>Save Changes</button>
                         <button className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400" onClick={() => setEditingEvent(null)}>Cancel</button>
+                                {event.isOffDay && <span className="px-2 py-1 bg-red-200 text-red-800 rounded text-xs">Off Day</span>}
+                                {event.specialSchedule && <span className="px-2 py-1 bg-yellow-200 text-yellow-800 rounded text-xs">Special Schedule</span>}
+                                {event.eventType && <span className="px-2 py-1 bg-blue-200 text-blue-800 rounded text-xs">{event.eventType}</span>}
                     </div>
                 ) : (
                     <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" onClick={handleCreateEvent}>Create Event</button>

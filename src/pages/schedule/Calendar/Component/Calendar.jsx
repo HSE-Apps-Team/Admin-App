@@ -1,8 +1,11 @@
+
 import React, { useEffect, useState } from 'react';
 import CalendarDay from './Day';
 
 const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSelectedEndDate, refreshHelper }) => {
     const [dayCache, setDayCache] = useState([]);
+    const [events, setEvents] = useState([]);
+    const [eventTypes, setEventTypes] = useState([]);
 
     useEffect(() => {
         const fetchDayCache = async () => {
@@ -28,6 +31,40 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
             }
         };
         fetchDayCache();
+
+        // Fetch events for the current month
+        const fetchEvents = async () => {
+            const year = month.getFullYear();
+            const monthIndex = month.getMonth() + 1;
+            try {
+                const res = await fetch(`/api/schedule/events2`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setEvents(data);
+                } else {
+                    setEvents([]);
+                }
+            } catch {
+                setEvents([]);
+            }
+        };
+        fetchEvents();
+
+        // Fetch event types
+        const fetchEventTypes = async () => {
+            try {
+                const res = await fetch(`/api/schedule/eventTypes`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setEventTypes(data);
+                } else {
+                    setEventTypes([]);
+                }
+            } catch {
+                setEventTypes([]);
+            }
+        };
+        fetchEventTypes();
     }, [month, refreshHelper]);
     const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
     
@@ -36,20 +73,43 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
     const renderCalendarDays = () => {
         const year = month.getFullYear();
         const monthIndex = month.getMonth();
-        
+
         const daysInMonth = getDaysInMonth(year, monthIndex);
         const firstDayOfMonth = getFirstDayOfMonth(year, monthIndex);
-        
+
         // Calculate days from previous month to display
         const daysFromPrevMonth = firstDayOfMonth;
         const prevMonthDays = getDaysInMonth(year, monthIndex - 1);
-        
+
         // Calculate days from next month to display
         const totalDaysToDisplay = 42; // 6 rows of 7 days
         const daysFromNextMonth = totalDaysToDisplay - daysInMonth - daysFromPrevMonth;
-        
+
         const days = [];
-        
+
+        // Helper to get event colors for a given day
+        const getEventColorsForDay = (day, month, year) => {
+            const dayStr = `${year}-${month + 1}-${day}`;
+            const current = new Date(year, month, day);
+            // Helper to compare only date part
+            const isSameOrBetween = (date, start, end) => {
+                const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                const s = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+                const e = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+                return d >= s && d <= e;
+            };
+            const dayEvents = events.filter(ev => {
+                const start = new Date(ev.startDate);
+                const end = new Date(ev.endDate);
+                return isSameOrBetween(current, start, end);
+            });
+            const colors = dayEvents.map(ev => {
+                const type = eventTypes.find(et => et.name === ev.eventType);
+                return type ? type.color : undefined;
+            }).filter(Boolean);
+            return colors;
+        };
+
         // Add days from previous month
         for (let i = 0; i < daysFromPrevMonth; i++) {
             const day = prevMonthDays - daysFromPrevMonth + i + 1;
@@ -61,7 +121,8 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
                 month: monthIndex - 1,
                 year,
                 isCurrentMonth: false,
-                dayType: dayCache[key] || undefined
+                dayType: dayCache[key] || undefined,
+                eventColors: getEventColorsForDay(day, prevMonth, prevYear)
             });
         }
 
@@ -73,7 +134,8 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
                 month: monthIndex,
                 year,
                 isCurrentMonth: true,
-                dayType: dayCache[key] || undefined
+                dayType: dayCache[key] || undefined,
+                eventColors: getEventColorsForDay(i, monthIndex, year)
             });
         }
 
@@ -87,7 +149,8 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
                 month: monthIndex + 1,
                 year,
                 isCurrentMonth: false,
-                dayType: dayCache[key] || undefined
+                dayType: dayCache[key] || undefined,
+                eventColors: getEventColorsForDay(i, nextMonth, nextYear)
             });
         }
 
@@ -132,7 +195,7 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
     };
 
     const days = renderCalendarDays();
-    
+
     return (
         <div className="calendar">
             <div className="calendar-header">
@@ -146,18 +209,19 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
             </div>
             <div className="calendar-grid">
                 {days.map((day, index) => (
-                        <CalendarDay
-                            key={index}
-                            day={day.day}
-                            month={day.month}
-                            year={day.year}
-                            isCurrentMonth={day.isCurrentMonth}
-                            dayType={day.dayType}
-                            selectedDate={selectedDate}
-                            selectedEndDate={selectedEndDate}
-                            onClick={() => handleDateClick(day.day, day.month, day.year)}
-                            onRightClick={() => handleRightClick(day.day, day.month, day.year)}
-                        />
+                    <CalendarDay
+                        key={index}
+                        day={day.day}
+                        month={day.month}
+                        year={day.year}
+                        isCurrentMonth={day.isCurrentMonth}
+                        dayType={day.dayType}
+                        selectedDate={selectedDate}
+                        selectedEndDate={selectedEndDate}
+                        eventColors={day.eventColors}
+                        onClick={() => handleDateClick(day.day, day.month, day.year)}
+                        onRightClick={() => handleRightClick(day.day, day.month, day.year)}
+                    />
                 ))}
             </div>
         </div>

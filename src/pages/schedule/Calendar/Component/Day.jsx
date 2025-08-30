@@ -1,4 +1,5 @@
-const CalendarDay = ({ day, month, year,  onClick, selectedDate, selectedEndDate, isCurrentMonth, onRightClick, dayType }) => {
+const CalendarDay = ({ day, month, year,  onClick, selectedDate, selectedEndDate, isCurrentMonth, onRightClick, dayType, eventColors = [] }) => {
+
     // Only render if day, month, year are valid numbers
     if (typeof day !== 'number' || typeof month !== 'number' || typeof year !== 'number') {
         return (
@@ -7,6 +8,8 @@ const CalendarDay = ({ day, month, year,  onClick, selectedDate, selectedEndDate
             </div>
         );
     }
+
+
 
         const dateObj = new Date(year, month, day);
 
@@ -68,26 +71,63 @@ const CalendarDay = ({ day, month, year,  onClick, selectedDate, selectedEndDate
         }
     }
 
+
     return (
-        <div
-            className={`calendar-day ${!isCurrentMonth ? 'not-current-month' : ''} day-type-${dayType}`}
-            onClick={() => onClick(dateObj)}
-            onContextMenu={e => {
-                e.preventDefault();
-                if (onRightClick) onRightClick(dateObj);
-            }}
-                style={{ 
-                    backgroundColor: baseColor,
-                    color: !isCurrentMonth
-                        ? '#b0b0b0' // Gray text for previous/next month
-                        : (baseColor === '#ffffff' ? '#000' : (baseColor !== 'transparent' ? '#fff' : undefined)),
-                    border: borderWidth !== '0px' ? `${borderWidth} solid #000` : 'none',
-                    boxSizing: 'border-box'
+            <div
+                className={`calendar-day ${!isCurrentMonth ? 'not-current-month' : ''} day-type-${dayType}`}
+                onClick={() => onClick(dateObj)}
+                onContextMenu={e => {
+                    e.preventDefault();
+                    if (onRightClick) onRightClick(dateObj);
                 }}
-            title={dayType}
-        >
-            {day}
-        </div>
+                style={{
+                    color: !isCurrentMonth ? '#222' : '#000',
+                    opacity: !isCurrentMonth ? 0.5 : 1,
+                    border: borderWidth !== '0px' ? `${borderWidth} solid #000` : 'none',
+                    boxSizing: 'border-box',
+                    position: 'relative',
+                    backgroundColor: 'transparent',
+                    transition: 'color 0.2s, opacity 0.2s',
+                }}
+                title={dayType}
+            >
+                <span style={{position: 'relative', zIndex: 2}}>{day}</span>
+                <div
+                    style={{
+                        position: 'absolute',
+                        left: 0,
+                        bottom: 0,
+                        width: '100%',
+                        height: '15%',
+                        backgroundColor: baseColor,
+                        zIndex: 1,
+                        borderBottomLeftRadius: '4px',
+                        borderBottomRightRadius: '4px',
+                    }}
+                />
+                {/* Render event colors as small dots or bars at the top of the cell */}
+                {eventColors.length > 0 && (
+                    <div style={{
+                        position: 'absolute',
+                        top: 2,
+                        left: 2,
+                        display: 'flex',
+                        gap: '2px',
+                        zIndex: 3,
+                    }}>
+                        {eventColors.map((color, idx) => (
+                            <span key={idx} style={{
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: '50%',
+                                background: color,
+                                border: '1px solid #000',
+                                boxShadow: '0 0 2px #0002',
+                            }} />
+                        ))}
+                    </div>
+                )}
+            </div>
     );
 
 }

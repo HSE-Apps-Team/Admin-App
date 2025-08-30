@@ -3,13 +3,14 @@ import CalendarNavbar from "./Component/Navbar";
 import EventEditor from "./EventEditor";
 import React from "react";
 import DayCalculator from "./DayCalculator";
+import EventTypeEditor from "./EventTypeEditor";
 
 const CalendarView = () => {
-    const [month, setMonth] = React.useState(new Date());
-    const [selectedDate, setSelectedDate] = React.useState(null);
-    const [selectedEndDate, setSelectedEndDate] = React.useState(null);
-
-    const [selectedYear, setSelectedYear] = React.useState(null);
+  const today = new Date();
+  const [month, setMonth] = React.useState(today);
+  const [selectedDate, setSelectedDate] = React.useState(today);
+  const [selectedEndDate, setSelectedEndDate] = React.useState(today);
+  const [selectedYear, setSelectedYear] = React.useState(today.getFullYear());
 
     const [refreshHelper, setRefreshHelper] = React.useState(0);
 
@@ -18,7 +19,7 @@ const CalendarView = () => {
   return (
     <div>
       <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <div style={{ width: '50%' }}>
+        <div style={{ width: '40%' }}>
           <CalendarNavbar month={month} setMonth={setMonth} refresh={refresh} />  
           <Calendar
             month={month}
@@ -29,16 +30,21 @@ const CalendarView = () => {
             refreshHelper={refreshHelper}
           />
           <p> Left click to set start date, Right Click to set end date</p>
-          <DayCalculator selectedDate={selectedDate} selectedEndDate={selectedEndDate} refresh={refresh} />
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
+            <DayCalculator selectedDate={selectedDate} selectedEndDate={selectedEndDate} refresh={refresh} refreshHelper={refreshHelper} />
+          </div>
         </div>
-        <EventEditor
-          selectedDate={selectedDate}
-          selectedEndDate={selectedEndDate}
-          setSelectedDate={setSelectedDate}
-          setSelectedEndDate={setSelectedEndDate}
-          style={{ width: '50%' }}
-          refresh={refresh}
-        />
+        <div style={{ width: '67%', display: 'flex', flexDirection: 'row' }}>
+            <EventEditor
+              selectedDate={selectedDate}
+              selectedEndDate={selectedEndDate}
+              setSelectedDate={setSelectedDate}
+              setSelectedEndDate={setSelectedEndDate}
+              refresh={refresh}
+              refreshHelper={refreshHelper}
+            />
+          <EventTypeEditor refresh={refresh} refreshHelper={refreshHelper} />
+        </div>
       </div>
     </div>
   );
