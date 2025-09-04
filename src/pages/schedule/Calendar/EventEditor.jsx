@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-// get events from the api regarding what events are that day, incuding those starting ending, or overlapping with the selected date
-// if no events, show a message indicating no events are scheduled for the selected date
-// also allow for new events to be created at the selected date
-// also allow for editing of events
+// creates and edits events, including those starting, ending, or overlapping with the selected date, uses the selected dates for a lot of things
+// made with a lot of ai, so good luck changing anything without ai
+// ai works pretty good with this component anyway so you should be fine
 
 
 const EventEditor = ({selectedDate, selectedEndDate, setSelectedDate, setSelectedEndDate, refresh, refreshHelper}) => {

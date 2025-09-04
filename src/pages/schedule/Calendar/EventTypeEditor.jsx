@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
+
+// just edits event type, ai made it pretty much from event editor
+
+
 const EventTypeEditor = ({ refresh, refreshHelper }) => {
 	const [eventTypes, setEventTypes] = useState([]);
 	const [loading, setLoading] = useState(true);

@@ -5,6 +5,12 @@ import React from "react";
 import DayCalculator from "./DayCalculator";
 import EventTypeEditor from "./EventTypeEditor";
 
+// parent component for the whole calendar editor system
+// does some styling and refreshing
+
+// the refresh system, so that all of the data is kept in sync, 
+// works by having a useState just cycle between 0 and 1, allowing for useEffects to re-run
+
 const CalendarView = () => {
   const today = new Date();
   const [month, setMonth] = React.useState(today);

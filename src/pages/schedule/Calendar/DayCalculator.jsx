@@ -56,15 +56,15 @@ const DayCalculator = ({ selectedDate, selectedEndDate, refresh }) => {
             });
             let dayType = "";
             let debugReason = "";
-            if (eventForDay && (eventForDay.offDay === true || eventForDay.isOffDay === true)) {
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                dayType = "Weekend";
+                debugReason = "Weekend";
+            } else if (eventForDay && (eventForDay.offDay === true || eventForDay.isOffDay === true)) {
                 dayType = "OffDay";
                 debugReason = `OffDay: offDay=${eventForDay.offDay}, isOffDay=${eventForDay.isOffDay}`;
             } else if (eventForDay && eventForDay.specialSchedule !== false) {
                 dayType = "Special";
                 debugReason = `Special: specialSchedule=${eventForDay.specialSchedule}`;
-            } else if (dayOfWeek === 0 || dayOfWeek === 6) {
-                dayType = "Weekend";
-                debugReason = "Weekend";
             } else if (dayOfWeek >= 1 && dayOfWeek <= 5) {
                 dayType = type;
                 debugReason = `Weekday: ${type}`;
