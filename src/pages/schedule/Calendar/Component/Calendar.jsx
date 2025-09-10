@@ -8,9 +8,12 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
     const [eventTypes, setEventTypes] = useState([]);
 
     useEffect(() => {
+        if (!month) return;
         const fetchDayCache = async () => {
-            const year = month.getFullYear();
-            const monthIndex = month.getMonth() + 1; // API expects 1-based month
+            if (!month) return;
+            const year = month.getFullYear?.();
+            const monthIndex = month.getMonth?.() + 1; // API expects 1-based month
+            if (year === undefined || monthIndex === undefined) return;
             try {
                 const res = await fetch(`/api/schedule/dayCache?month=${monthIndex}&year=${year}`);
                 if (res.ok) {
@@ -34,8 +37,10 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
 
         // Fetch events for the current month
         const fetchEvents = async () => {
-            const year = month.getFullYear();
-            const monthIndex = month.getMonth() + 1;
+            if (!month) return;
+            const year = month.getFullYear?.();
+            const monthIndex = month.getMonth?.() + 1;
+            if (year === undefined || monthIndex === undefined) return;
             try {
                 const res = await fetch(`/api/schedule/events2`);
                 if (res.ok) {
@@ -66,13 +71,21 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
         };
         fetchEventTypes();
     }, [month, refreshHelper]);
-    const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
-    
-    const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
-    
+    const getDaysInMonth = (year, month) => {
+        if (typeof year !== 'number' || typeof month !== 'number') return 0;
+        return new Date(year, month + 1, 0).getDate();
+    };
+
+    const getFirstDayOfMonth = (year, month) => {
+        if (typeof year !== 'number' || typeof month !== 'number') return 0;
+        return new Date(year, month, 1).getDay();
+    };
+
     const renderCalendarDays = () => {
+        if (!month || typeof month.getFullYear !== 'function' || typeof month.getMonth !== 'function') return [];
         const year = month.getFullYear();
         const monthIndex = month.getMonth();
+        if (typeof year !== 'number' || typeof monthIndex !== 'number') return [];
 
         const daysInMonth = getDaysInMonth(year, monthIndex);
         const firstDayOfMonth = getFirstDayOfMonth(year, monthIndex);
@@ -89,16 +102,20 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
 
         // Helper to get event colors for a given day
         const getEventColorsForDay = (day, month, year) => {
+            if (typeof year !== 'number' || typeof month !== 'number' || typeof day !== 'number') return [];
             const dayStr = `${year}-${month + 1}-${day}`;
             const current = new Date(year, month, day);
             // Helper to compare only date part
             const isSameOrBetween = (date, start, end) => {
+                if (!date || !start || !end) return false;
+                if (typeof date.getFullYear !== 'function' || typeof start.getFullYear !== 'function' || typeof end.getFullYear !== 'function') return false;
                 const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
                 const s = new Date(start.getFullYear(), start.getMonth(), start.getDate());
                 const e = new Date(end.getFullYear(), end.getMonth(), end.getDate());
                 return d >= s && d <= e;
             };
             const dayEvents = events.filter(ev => {
+                if (!ev.startDate || !ev.endDate) return false;
                 const start = new Date(ev.startDate);
                 const end = new Date(ev.endDate);
                 return isSameOrBetween(current, start, end);
@@ -158,7 +175,7 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
     };
 
     const isDateSelected = (day, month, year) => {
-        if (!selectedDate) return false;
+        if (!selectedDate || typeof selectedDate.getDate !== 'function' || typeof selectedDate.getMonth !== 'function' || typeof selectedDate.getFullYear !== 'function') return false;
         return (
             selectedDate.getDate() === day &&
             selectedDate.getMonth() === month &&
@@ -167,23 +184,22 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
     };
 
     const handleDateClick = (day, month, year) => {
+        if (typeof year !== 'number' || typeof month !== 'number' || typeof day !== 'number') return;
         // Create a new date object for the clicked date
         const newDate = new Date(year, month, day);
-        
         // If clicked date is after selected end date, swap them
         if (selectedEndDate && newDate > selectedEndDate) {
             setSelectedDate(selectedEndDate);
             setSelectedEndDate(newDate);
             return;
         }
-        
         setSelectedDate(newDate);
     };
 
     const handleRightClick = (day, month, year) => {
         // Prevent right-click context menu
-        event.preventDefault();
-
+        if (typeof event !== 'undefined' && event.preventDefault) event.preventDefault();
+        if (typeof year !== 'number' || typeof month !== 'number' || typeof day !== 'number') return;
         // If right-clicked date is before selected date, swap them
         const newEndDate = new Date(year, month, day);
         if (selectedDate && newEndDate < selectedDate) {
@@ -195,6 +211,11 @@ const Calendar = ({ month, selectedDate, setSelectedDate, selectedEndDate, setSe
     };
 
     const days = renderCalendarDays();
+
+    // Defensive: If month is not ready, show loading or fallback
+    if (!month || typeof month.getFullYear !== 'function' || typeof month.getMonth !== 'function') {
+        return <div>Loading calendar...</div>;
+    }
 
     return (
         <div className="calendar">
