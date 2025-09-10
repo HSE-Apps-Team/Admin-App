@@ -14,7 +14,7 @@ const menuData = {
         href: "/schedule/special",
       },
       {
-        title: "Events",
+        title: "Events OLD",
         description: "Create new events that use special schedules",
         href: "/schedule/events",
       },

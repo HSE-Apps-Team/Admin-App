@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import ReactLoading from 'react-loading';
 import CalendarImage from './Calendar/CalendarImage';
+import CalendarView from './Calendar/View';
 
 export default function CalendarEditor() {
   //image uploader
@@ -91,6 +92,7 @@ export default function CalendarEditor() {
       <title>Calendar Editor</title>
     </Head>
     <div className="container mx-auto mt-4 p-4">
+      <CalendarView />
       <div className="flex">
         <CalendarImage/>
         <div className="flex flex-col">
