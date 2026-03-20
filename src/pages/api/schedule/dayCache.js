@@ -4,17 +4,39 @@ import connectDB from "../../../lib/schedule.db";
 // Helper to get month and year from a date
 function getMonthYear(date) {
 		const d = new Date(date);
-		return { month: d.getUTCMonth() + 1, year: d.getUTCFullYear() };
+		// Use local month/year to match user-local scheduling (avoid UTC offset issues)
+		return { month: d.getMonth() + 1, year: d.getFullYear() };
 }
 
 // Helper to get all dates between two dates
 function getDatesInRange(startDate, endDate) {
+		// Parse date-only strings (YYYY-MM-DD) without timezone shifts
+		function parseDateOnly(input) {
+			if (!input) return null;
+			if (input instanceof Date) return new Date(input.getFullYear(), input.getMonth(), input.getDate());
+			if (typeof input === 'string') {
+				// If string matches YYYY-MM-DD, construct as local date (no timezone)
+				const m = input.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+				if (m) {
+					const y = parseInt(m[1], 10);
+					const mo = parseInt(m[2], 10) - 1;
+					const d = parseInt(m[3], 10);
+					return new Date(y, mo, d);
+				}
+				// Fallback: let Date parse it (could include time or timezone)
+				return new Date(input);
+			}
+			// Fallback for other types
+			return new Date(input);
+		}
+
 		const dates = [];
-		let current = new Date(startDate);
-		const last = new Date(endDate);
+		let current = parseDateOnly(startDate);
+		const last = parseDateOnly(endDate);
+		if (!current || !last) return dates;
 		while (current <= last) {
 			// Always push a new Date object to avoid mutation issues
-			dates.push(new Date(current.getTime()));
+			dates.push(new Date(current.getFullYear(), current.getMonth(), current.getDate()));
 			current.setDate(current.getDate() + 1);
 		}
 		return dates;
@@ -54,7 +76,8 @@ export default async function handler(req, res) {
 			const monthMap = {};
 			dates.forEach(date => {
 				const { month, year } = getMonthYear(date);
-				const day = date.getUTCDate();
+				// Use local day to avoid UTC vs local-day mismatches for "today"
+				const day = date.getDate();
 				const key = `${year}-${month}`;
 				if (!monthMap[key]) monthMap[key] = { month, year, days: [] };
 				monthMap[key].days.push({ day, dayType });
@@ -89,7 +112,7 @@ export default async function handler(req, res) {
 		const dates = getDatesInRange(startDate, endDate);
 		for (const date of dates) {
 			const { month, year } = getMonthYear(date);
-			const day = date.getUTCDate();
+			const day = date.getDate();
 			// Update dayType for this day
 			await collection.updateOne(
 				{ month, year, "days.day": day },
@@ -108,7 +131,7 @@ export default async function handler(req, res) {
 		const dates = getDatesInRange(startDate, endDate);
 		for (const date of dates) {
 			const { month, year } = getMonthYear(date);
-			const day = date.getUTCDate();
+			const day = date.getDate();
 			await collection.updateOne(
 				{ month, year },
 				{ $pull: { days: { day } } }

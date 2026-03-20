@@ -43,7 +43,7 @@ export default function Login() {
       <Head>
         <title>Login - Admin Panel</title>
       </Head>
-      <h3 style={{ backgroundColor: "#FFCCCC" }}>This is the login for the HSE Admin App. Recently, due to security concerns, the password has changed. If you need the new password, or are experiencing an error, email <a href="mailto:patchjoh000@hsestudents.org">patchjoh000@hsestudents.org</a> or <a href="mailto:jalano@hse.k12.in.us">jalano@hse.k12.in.us</a>. This change was made in a quick security fix, so if there are any bugs, please report them.</h3>
+      {/* <h3 style={{ backgroundColor: "#FFCCCC" }}>This is the login for the HSE Admin App. Recently, due to security concerns, the password has changed. If you need the new password, or are experiencing an error, email <a href="mailto:patchjoh000@hsestudents.org">patchjoh000@hsestudents.org</a> or <a href="mailto:jalano@hse.k12.in.us">jalano@hse.k12.in.us</a>. This change was made in a quick security fix, so if there are any bugs, please report them.</h3> */}
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="bg-white p-8 rounded-lg shadow-md w-96">
           <h1 className="text-2xl font-bold text-center mb-6">Admin Login</h1>
