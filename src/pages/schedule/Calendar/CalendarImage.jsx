@@ -27,15 +27,46 @@ const CalendarImage = () => {
     fetchImages();
   }, []);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(file);
+  // Vercel's serverless functions enforce a hard ~4.5mb request body limit that
+  // no Next.js config can raise, so large photos must be downscaled/recompressed
+  // client-side before they're ever turned into a base64 data URL.
+  const MAX_DIMENSION = 1600;
+  const JPEG_QUALITY = 0.8;
 
-      // Preview image
+  const compressImage = (file) =>
+    new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => setImagePreview(reader.result);
+      reader.onerror = () => reject(new Error("Could not read the selected file."));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error("Could not decode the selected image."));
+        img.onload = () => {
+          const scale = Math.min(1, MAX_DIMENSION / Math.max(img.width, img.height));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          resolve(canvas.toDataURL("image/jpeg", JPEG_QUALITY));
+        };
+        img.src = reader.result;
+      };
       reader.readAsDataURL(file);
+    });
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const compressedDataUrl = await compressImage(file);
+      setImage(compressedDataUrl);
+      setImagePreview(compressedDataUrl);
+    } catch (error) {
+      console.error("Error processing image:", error);
+      alert("Could not process the selected image. Please try a different file.");
     }
   };
 
@@ -52,48 +83,37 @@ const CalendarImage = () => {
     }
 
     setLoading(true);
-    const formData = new FormData();
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const imgUrl = reader.result;
-      formData.append('name', name);
-      formData.append('imgUrl', imgUrl);
-
     try {
-        const response = await fetch('/api/schedule/calendar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body : JSON.stringify({image: imgUrl, name: name})
-        });
+      const response = await fetch('/api/schedule/calendar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ image, name })
+      });
 
-        if (response.ok) {
-            const newImage = await response.json();
-            setImages((prevImages) => [...prevImages, newImage]);
-            alert('Image uploaded successfully!');
-        } else if (response.status === 413) {
-            alert('Failed to upload image: the file is too large. Please use a smaller image.');
-        } else {
-            let message = `Request failed with status ${response.status}`;
-            try {
-                const errorData = await response.json();
-                message = errorData.message || message;
-            } catch {
-                // Response wasn't JSON (e.g. a plain error page); fall back to status text above.
-            }
-            alert('Failed to upload image: ' + message);
-    }
+      if (response.ok) {
+        const newImage = await response.json();
+        setImages((prevImages) => [...prevImages, newImage]);
+        alert('Image uploaded successfully!');
+      } else if (response.status === 413) {
+        alert('Failed to upload image: the file is too large. Please use a smaller image.');
+      } else {
+        let message = `Request failed with status ${response.status}`;
+        try {
+          const errorData = await response.json();
+          message = errorData.message || message;
+        } catch {
+          // Response wasn't JSON (e.g. a plain error page); fall back to status text above.
+        }
+        alert('Failed to upload image: ' + message);
+      }
     } catch (error) {
-        console.error('Error uploading image:', error);
-        alert('An error occurred while uploading: ' + error.message);
+      console.error('Error uploading image:', error);
+      alert('An error occurred while uploading: ' + error.message);
     } finally {
-        setLoading(false);
-    
+      setLoading(false);
     }
-    }
-
-    reader.readAsDataURL(image);
   };
 
   const handleDelete = async (id) => {
