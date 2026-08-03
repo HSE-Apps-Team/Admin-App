@@ -4,6 +4,16 @@ import { ObjectId } from "mongodb";
 // Import the custom database connection library
 import connectDB from "../../../lib/schedule.db";
 
+// Calendar images are uploaded as base64 data URLs, which routinely exceed
+// Next's default 1mb API body limit and fail with a 413.
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "10mb",
+    },
+  },
+};
+
 // Define the handler function for the API route
 export default async function handler(req, res) {
   // Connect to the database

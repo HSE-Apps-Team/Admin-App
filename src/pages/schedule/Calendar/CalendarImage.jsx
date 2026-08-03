@@ -72,13 +72,21 @@ const CalendarImage = () => {
             const newImage = await response.json();
             setImages((prevImages) => [...prevImages, newImage]);
             alert('Image uploaded successfully!');
+        } else if (response.status === 413) {
+            alert('Failed to upload image: the file is too large. Please use a smaller image.');
         } else {
-            const errorData = await response.json();
-            alert('Failed to upload image: ' + errorData.message);
+            let message = `Request failed with status ${response.status}`;
+            try {
+                const errorData = await response.json();
+                message = errorData.message || message;
+            } catch {
+                // Response wasn't JSON (e.g. a plain error page); fall back to status text above.
+            }
+            alert('Failed to upload image: ' + message);
     }
     } catch (error) {
         console.error('Error uploading image:', error);
-        alert('An error occurred. Please try again.');
+        alert('An error occurred while uploading: ' + error.message);
     } finally {
         setLoading(false);
     
