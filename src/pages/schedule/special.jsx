@@ -138,6 +138,36 @@ export default function SpecialSchedules() {
   };
 
   /**
+   * Toggles/updates the bag drop off sub-block nested under the B lunch period.
+   * Only relevant for the B lunch type, so it is only shown to B lunch viewers downstream.
+   * @param {number} index - The index of the period in the selected schedule data.
+   * @param {boolean} checked - Whether the bag drop off checkbox is checked.
+   */
+  const handleBagDropOffToggle = (index, checked) => {
+    setSelectedSchedule((prev) => {
+      const newSchedule = { ...prev };
+      if (checked) {
+        newSchedule.data[index].lunchPeriods.B.bagDropOff = {
+          startTime: "11:50 AM",
+          endTime: "11:53 AM",
+        };
+      } else {
+        delete newSchedule.data[index].lunchPeriods.B.bagDropOff;
+      }
+      return newSchedule;
+    });
+  };
+
+  const handleBagDropOffChange = (e, index) => {
+    setSelectedSchedule((prev) => {
+      const newSchedule = { ...prev };
+      newSchedule.data[index].lunchPeriods.B.bagDropOff[e.target.id] =
+        e.target.value;
+      return newSchedule;
+    });
+  };
+
+  /**
    * Adds a new lunch type to the specified period in the selected schedule.
    * @param {number} index - The index of the period in the selected schedule data.
    */
@@ -419,6 +449,47 @@ export default function SpecialSchedules() {
                           }
                         />
                       </div>
+                      {lunchType === "B" && (
+                        <div className="mt-2">
+                          <label className="hover:cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={!!period.lunchPeriods.B.bagDropOff}
+                              onChange={(e) =>
+                                handleBagDropOffToggle(
+                                  periodIndex,
+                                  e.target.checked
+                                )
+                              }
+                            />
+                            {"  "}
+                            Bag Drop Off (B Lunch only)
+                          </label>
+                          {period.lunchPeriods.B.bagDropOff && (
+                            <div className="flex items-center justify-between gap-x-3 mt-1">
+                              <input
+                                type="text"
+                                className="w-[5rem] border-slate-500 border-2 rounded-lg p-1"
+                                id="startTime"
+                                value={period.lunchPeriods.B.bagDropOff.startTime}
+                                onChange={(e) =>
+                                  handleBagDropOffChange(e, periodIndex)
+                                }
+                              />
+                              <h1>-</h1>
+                              <input
+                                type="text"
+                                className="w-[5rem] border-slate-500 border-2 rounded-lg p-1"
+                                id="endTime"
+                                value={period.lunchPeriods.B.bagDropOff.endTime}
+                                onChange={(e) =>
+                                  handleBagDropOffChange(e, periodIndex)
+                                }
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
                       {lunchType === "D" && (
                         <div className="mt-2">
                           <label className="hover:cursor-pointer">
