@@ -10,7 +10,8 @@ export default function SpecialSchedules() {
     SpecialType: "Special Type",
     data: [],
   });
-  const lunchTypes = ["A", "B", "C", "D"];
+  // const lunchTypes = ["A", "B", "C", "D"]; // commented out for 4 to 3 lunch switch
+  const lunchTypes = ["B", "C", "D"];
 
   useEffect(() => {
     fetch("/api/schedule/special").then((res) => {
@@ -56,7 +57,11 @@ export default function SpecialSchedules() {
         setSelectedSchedule((prev) => {
           const newSchedule = { ...prev };
           newSchedule.data[index].lunchPeriods = {
-            A: {
+            // A: { // commented out for 4 to 3 lunch switch
+            //   startTime: "8:30 AM",
+            //   endTime: "1:30 PM",
+            // },
+            B: {
               startTime: "8:30 AM",
               endTime: "1:30 PM",
             },
@@ -97,6 +102,36 @@ export default function SpecialSchedules() {
     setSelectedSchedule((prev) => {
       const newSchedule = { ...prev };
       newSchedule.data[index].lunchPeriods[lunchType][e.target.id] =
+        e.target.value;
+      return newSchedule;
+    });
+  };
+
+  /**
+   * Toggles/updates the bag pickup sub-block nested under the D lunch period.
+   * Only relevant for the D lunch type, so it is only shown to D lunch viewers downstream.
+   * @param {Event} e - The change event triggered by the form input.
+   * @param {number} index - The index of the period in the selected schedule data.
+   */
+  const handleBagPickupToggle = (index, checked) => {
+    setSelectedSchedule((prev) => {
+      const newSchedule = { ...prev };
+      if (checked) {
+        newSchedule.data[index].lunchPeriods.D.bagPickup = {
+          startTime: "1:23 PM",
+          endTime: "1:26 PM",
+        };
+      } else {
+        delete newSchedule.data[index].lunchPeriods.D.bagPickup;
+      }
+      return newSchedule;
+    });
+  };
+
+  const handleBagPickupChange = (e, index) => {
+    setSelectedSchedule((prev) => {
+      const newSchedule = { ...prev };
+      newSchedule.data[index].lunchPeriods.D.bagPickup[e.target.id] =
         e.target.value;
       return newSchedule;
     });
@@ -384,6 +419,47 @@ export default function SpecialSchedules() {
                           }
                         />
                       </div>
+                      {lunchType === "D" && (
+                        <div className="mt-2">
+                          <label className="hover:cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={!!period.lunchPeriods.D.bagPickup}
+                              onChange={(e) =>
+                                handleBagPickupToggle(
+                                  periodIndex,
+                                  e.target.checked
+                                )
+                              }
+                            />
+                            {"  "}
+                            Bag Pickup (D Lunch only)
+                          </label>
+                          {period.lunchPeriods.D.bagPickup && (
+                            <div className="flex items-center justify-between gap-x-3 mt-1">
+                              <input
+                                type="text"
+                                className="w-[5rem] border-slate-500 border-2 rounded-lg p-1"
+                                id="startTime"
+                                value={period.lunchPeriods.D.bagPickup.startTime}
+                                onChange={(e) =>
+                                  handleBagPickupChange(e, periodIndex)
+                                }
+                              />
+                              <h1>-</h1>
+                              <input
+                                type="text"
+                                className="w-[5rem] border-slate-500 border-2 rounded-lg p-1"
+                                id="endTime"
+                                value={period.lunchPeriods.D.bagPickup.endTime}
+                                onChange={(e) =>
+                                  handleBagPickupChange(e, periodIndex)
+                                }
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 <button

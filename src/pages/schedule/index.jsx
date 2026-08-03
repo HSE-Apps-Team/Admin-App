@@ -79,6 +79,23 @@ export default function MainSchedule() {
     });
   };
 
+  /**
+   * Updates the bag pickup sub-block nested under the D lunch period.
+   * Bag pickup only applies to D lunch, so it is only ever shown to D lunch viewers downstream.
+   * @param {Event} e - The change event triggered by the form input.
+   * @param {number} index - The index of the schedule in the main schedules state.
+   * @param {number} periodIndex - The index of the period in the schedule data.
+   */
+  const onBagPickupChange = (e, index, periodIndex) => {
+    setMainSchedules((prev) => {
+      const newSchedules = [...prev];
+      newSchedules[index].data[periodIndex].lunchPeriods.D.bagPickup[
+        e.target.id
+      ] = e.target.value;
+      return newSchedules;
+    });
+  };
+
   if (!mainSchedules) {
     return (
       <div className="flex w-full h-100vh items-center justify-center">
@@ -160,6 +177,35 @@ export default function MainSchedule() {
                           }}
                         />
                       </div>
+                      {lunchType === "D" &&
+                        period.lunchPeriods.D.bagPickup && (
+                          <div className="ml-3">
+                            <h1 className="text-sm text-blue-300 mt-1">
+                              Bag Pickup (D Lunch only)
+                            </h1>
+                            <div className="flex items-center justify-between gap-x-3">
+                              <input
+                                type="text"
+                                className="w-[5rem] border-slate-500 border-2 rounded-lg p-1"
+                                id="startTime"
+                                value={period.lunchPeriods.D.bagPickup.startTime}
+                                onChange={(e) => {
+                                  onBagPickupChange(e, index, periodIndex);
+                                }}
+                              />
+                              <h1>-</h1>
+                              <input
+                                type="text"
+                                className="w-[5rem] border-slate-500 border-2 rounded-lg p-1"
+                                id="endTime"
+                                value={period.lunchPeriods.D.bagPickup.endTime}
+                                onChange={(e) => {
+                                  onBagPickupChange(e, index, periodIndex);
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )}
                     </div>
                   ))}
               </>
